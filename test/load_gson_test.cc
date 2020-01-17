@@ -28,10 +28,13 @@
  */
 
 #include <iostream>
+#include <chrono>
 #include "pmgd.h"
 #include "util.h"
 
 using namespace PMGD;
+using namespace std;
+using namespace chrono;
 
 long long num_nodes = 0;
 long long num_edges = 0;
@@ -49,10 +52,15 @@ int main(int argc, char *argv[])
     try {
         Graph db("load_gson_graph", Graph::Create);
 
+        auto start_t = system_clock::now();
         load_gson(db, argv[1], node_added, edge_added);
-        Transaction tx(db);
-        dump_debug(db);
-        tx.commit();
+        auto end_t   = system_clock::now();
+        auto duration = duration_cast<microseconds>(end_t - start_t);
+        printf("load finished. duration is %f microseconds ≈ %f s, \n", double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den);
+
+        // Transaction tx(db);
+        // dump_debug(db);
+        // tx.commit();
     }
     catch (Exception e) {
         print_exception(e);

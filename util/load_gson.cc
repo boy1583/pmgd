@@ -202,7 +202,8 @@ static void load_nodes(Graph &db,
         Json::Value jnode = jnodes[i];
 
         int id = get_int_value(jnode, "_id", true);
-        std::string label = get_string_value(jnode, "_label", true);
+        // std::string label = get_string_value(jnode, "_label", true);
+        std::string label = get_string_value(jnode, "xlabel", true);
 
         Transaction tx(db, Transaction::ReadWrite);
         Node *node = get_node(db, id, label.c_str(), node_func);
@@ -239,10 +240,11 @@ static void load_gson(Graph &db,
                 std::function<void(Node &)> node_func,
                 std::function<void(Edge &)> edge_func)
 {
-    Json::Value jgraph = root["graph"];
+    /*Json::Value jgraph = root["graph"];
     if (jgraph.type() != Json::objectValue) {
         throw PMGDException(LoaderFormatError, "graph not found");
-    }
+    }*/
+    Json::Value &jgraph = root;
 
     Json::Value jmode = jgraph["mode"];
     if (jmode.type() != Json::stringValue) {
