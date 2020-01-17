@@ -53,20 +53,11 @@ int main(int argc, char *argv[])
 
     try {
         Graph db("load_tsv_graph", Graph::Create);
-
-//        FILE *fptr;
-//        if ((fptr = fopen(argv[1], "r")) == NULL) {
-//            printf("Error! opening file");
-//            exit(1);
-//        }
-
         auto start_t = system_clock::now();
         load_tsv(db, argv[1], node_added, edge_added);
         auto end_t   = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t);
         printf("load finished. duration is %f microseconds ≈ %f s, \n", double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den);
-
-//        fclose(fptr);
     }
     catch (Exception e) {
         std::cerr << argv[0] << ": stdin: Exception " << e.name << " occurred on line " << line << "\n";
