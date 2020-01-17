@@ -120,7 +120,7 @@ static long long get_long_long_value(Json::Value &obj, const char *key_str, bool
 
     long long val;
     if (key_obj.type() == Json::intValue)
-        val = key_obj.asUInt64();
+        val = key_obj.asInt64();
     else {
         assert(key_obj.type() == Json::stringValue);
         val = stoi(key_obj.asString(), NULL);
@@ -150,7 +150,7 @@ static void set_property(T *elem, const char *pkey, Json::Value &pval)
             elem->set_property(pkey, pval.asInt());
             break;
         case Json::uintValue:
-            elem->set_property(pkey, (long long)pval.asUInt());
+            elem->set_property(pkey, (long long)pval.asInt64());
             break;
         case Json::realValue:
             elem->set_property(pkey, pval.asDouble());
