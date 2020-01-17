@@ -67,7 +67,8 @@ void load_tsv(Graph &db, FILE *f,
         Transaction tx(db, Transaction::ReadWrite);
         Node &src = get_node(db, a, node_func);
         Node &dst = get_node(db, b, node_func);
-        Edge &edge = db.add_edge(src, dst, 0);
+        // Edge &edge = db.add_edge(src, dst, 0);
+        Edge &edge = db.add_edge(src, dst, "labelE");
         if (edge_func)
             edge_func(edge);
         tx.commit();
@@ -83,7 +84,8 @@ static Node &get_node(Graph &db, long long id,
     if (nodes) return *nodes;
 
     // Node not found; add it
-    Node &node = db.add_node(0);
+    // Node &node = db.add_node(0);
+    Node &node = db.add_node("labelV");
     node.set_property(ID_STR, id);
     if (node_func)
         node_func(node);

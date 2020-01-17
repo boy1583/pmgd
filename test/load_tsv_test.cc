@@ -28,10 +28,13 @@
  */
 
 #include <iostream>
+#include <chrono>
 #include "pmgd.h"
 #include "util.h"
 
 using namespace PMGD;
+using namespace std;
+using namespace chrono;
 
 long long num_nodes = 0;
 long long num_edges = 0;
@@ -46,7 +49,11 @@ int main(int argc, char *argv[])
     try {
         Graph db("load_tsv_graph", Graph::Create);
 
+        auto start_t = system_clock::now();
         load_tsv(db, stdin, node_added, edge_added);
+        auto end_t   = system_clock::now();
+        auto duration = duration_cast<microseconds>(end_t - start_t);
+        printf("load finished. duration is %f microseconds ≈ %f s, \n", double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den);
     }
     catch (Exception e) {
         std::cerr << argv[0] << ": stdin: Exception " << e.name << " occurred on line " << line << "\n";
