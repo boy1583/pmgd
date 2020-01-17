@@ -12,6 +12,6 @@ include_directories(${CMAKE_SOURCE_DIR}/../include ${CMAKE_SOURCE_DIR}/../third_
 
 link_directories(${CMAKE_SOURCE_DIR}/../lib)
 
-link_libraries(pmgd)
+link_libraries(pmgd pmgd-util jsoncpp)
 
 add_executable(node_edge_benchmark node_edge_benchmark.cpp)

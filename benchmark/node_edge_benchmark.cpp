@@ -260,7 +260,8 @@ int main(int argc, char* argv[]) {
 //        printf("load finished. duration is %f microseconds ≈ %f s, \n", double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den);
     }
     catch (Exception e) {
-        std::cerr << argv[0] << ": stdin: Exception " << e.name << " " << e.msg << "\n";
+        print_exception(e);
+        // std::cerr << argv[0] << ": stdin: Exception " << e.name << " " << e.msg << "\n";
         return 1;
     }
 }
