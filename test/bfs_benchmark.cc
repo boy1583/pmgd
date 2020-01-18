@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
         vector<long long> tmp = {966892,68103,505800,194272,218438,66102,460371,696911,346984,1189161};
         sources = tmp;
     } else {
-        printf("unknow dataset lids, use 1 as source node, create sample graph");
+        printf("unknow dataset lids, use 1 as source node, create sample graph.\n");
         vector<long long> tmp = {1};
         sources = tmp;
 
@@ -125,14 +125,13 @@ int main(int argc, char* argv[]) {
     }
 
     try {
-        ID = StringID(ID_STR);
-
         Graph db(dbName.c_str(), Graph::ReadOnly);
 
         // 确定点是否存在
         vector<StringID> ss;
         {
             Transaction tx(db, Transaction::ReadOnly);
+            ID = StringID(ID_STR);
             for (auto s : sources) {
                 NodeIterator nodes = db.get_nodes(0, PropertyPredicate(ID, PropertyPredicate::Eq, s));
                 if (nodes) {
