@@ -373,6 +373,7 @@ int main(int argc, char* argv[]) {
             Graph db(argv[2], Graph::ReadWrite);
 
             count(db);
+
         } else {
             usage();
         }

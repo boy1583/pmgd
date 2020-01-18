@@ -61,6 +61,18 @@ int main(int argc, char *argv[])
         // Transaction tx(db);
         // dump_debug(db);
         // tx.commit();
+
+        Transaction tx(db, Transaction::ReadOnly);
+        // 检验是否读取正确
+        NodeIterator nodes = db.get_nodes(0,
+                                          PropertyPredicate(StringID("pmgd.loader.id"), PropertyPredicate::Eq, 1));
+        Node &node = *nodes;
+        auto iter = node.get_properties();
+        while (iter) {
+            printf("  %s: %s\n", iter->id().name().c_str(), property_text(*iter).c_str());
+            iter.next();
+        }
+
     }
     catch (Exception e) {
         print_exception(e);
@@ -69,6 +81,8 @@ int main(int argc, char *argv[])
 
     std::cout << "\nNodes (" << num_nodes << ")\t";
     std::cout << "Edges (" << num_edges << ")\n";
+
+
 
     return 0;
 }

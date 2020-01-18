@@ -141,8 +141,7 @@ get_string_value(Json::Value &obj, const char *key_str, bool remove)
 template <typename T>
 static void set_property(T *elem, const char *pkey, Json::Value &pval)
 {
-    switch(pval.type())
-    {
+    switch(pval.type()) {
         case Json::nullValue:
             elem->set_property(pkey, Property());
             break;
@@ -174,6 +173,14 @@ static void set_property(T *elem, const char *pkey, Json::Value &pval)
         case Json::booleanValue:
             elem->set_property(pkey, pval.asBool());
             break;
+        case Json::objectValue:
+            {
+                // unexact it
+                if (pval.isMember("type") && pval.isMember("value")) {
+                    set_property(elem, "value", pval["value"]);
+                }
+            }
+            break;
         default:
            break;
     }
@@ -185,11 +192,12 @@ static void set_properties(T *elem, Json::Value &jnode)
     Json::Value::Members members(jnode.getMemberNames());
     for(Json::Value::Members::iterator it = members.begin();
         it != members.end();
-        ++it )
-    {
+        ++it ) {
         const std::string &pkey = *it;
-        if (pkey[0] != '_')
+        if (pkey[0] != '_') {
+            // is object ?
             set_property(elem, pkey.c_str(), jnode[pkey]);
+        }
     }
 }
 
@@ -202,9 +210,12 @@ static void load_nodes(Graph &db,
         Json::Value jnode = jnodes[i];
 
         long long id = get_long_long_value(jnode, "_id", true);
-        // std::string label = get_string_value(jnode, "_label", true);
-        // std::string label = get_string_value(jnode, "xlabel", true);
-        std::string label = get_string_value(jnode, "_type", true);
+        std::string label;
+        if (jnode.isMember("_label")) {
+            label = get_string_value(jnode, "_label", true);
+        } else {
+            label = get_string_value(jnode, "_type", true);
+        }
 
         Transaction tx(db, Transaction::ReadWrite);
         Node *node = get_node(db, id, label.c_str(), node_func);
@@ -251,7 +262,7 @@ static void load_gson(Graph &db,
     if (jmode.type() != Json::stringValue) {
         throw PMGDException(LoaderFormatError, "mode not found");
     }
-    if (jmode.asString().compare("NORMAL")) {
+    if (jmode.asString().compare("EXTENDED")) {
         throw PMGDException(LoaderFormatError, "mode not supported");
     }
 
