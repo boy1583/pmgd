@@ -100,6 +100,7 @@ int main(int argc, char* argv[]) {
         dbName = "sample";
         try {
             Graph db(dbName.c_str(), Graph::Create);
+            Transaction tx(db, Transaction::ReadWrite);
             Node &n1 = db.add_node(1);
             Node &n149 = db.add_node(149);
             Node &n434 = db.add_node(434);
@@ -116,6 +117,7 @@ int main(int argc, char* argv[]) {
             db.add_edge(n434, n249, 551);
             db.add_edge(n249, n977, 390);
             db.add_edge(n1, n434, 241);
+            tx.commit();
         } catch (Exception e) {
             print_exception(e);
             return 1;
