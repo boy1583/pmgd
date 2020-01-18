@@ -18,7 +18,9 @@ TEST_SRCS := $(addprefix test/, \
                          mtaddfindremovetest.cc \
                          rotest.cc BindingsTest.java DateTest.java \
                          neighbortest.cc aborttest.cc \
-                         test720.cc test750.cc test767.cc)
+                         test720.cc test750.cc test767.cc \
+                         node_edge_benchmark.cc \
+                         )
 
 # Derive a list of objects.
 TEST_COBJS := $(patsubst %.cc,%.o, \
@@ -38,7 +40,7 @@ TESTS += $(TEST_TESTS)
 TEST_LIBS = lib/pmgd.lib lib/pmgd-util.lib
 
 # Override the global defaults.
-TEST_INCLUDES := $(INCLUDES) -I$(ROOTDIR)/util
+TEST_INCLUDES := $(INCLUDES) -I$(ROOTDIR)/util -I$(ROOTDIR)/third_party
 TEST_CFLAGS := --std=c++11 $(TEST_INCLUDES) $(OPT) $(FFLAGS) $(WFLAGS) \
                  -DPMFLUSH=$(PMFLUSH) -MP -MMD
 
