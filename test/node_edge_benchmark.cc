@@ -310,12 +310,14 @@ void count(Graph &db) {
 }
 
 void usage() {
-    printf("Usage: program [ldbc_dataset_path] [create/load] [count...getnode...getedge...updatenode...updateedge...deleteedge...deletenode]\n");
+    printf("Usage:\n");
+    printf("\tprogram create [dataset_path] [Graph_Name] [count...getnode...getedge...updatenode...updateedge...deleteedge...deletenode]\n");
+    printf("\tprogram load [Graph_Name] [count]\n");
     exit(0);
 }
 
-void doWork(int argc, char* argv[], Graph &db) {
-    for (int i = 2;i < argc; i++) {
+void doWork(int index, int argc, char* argv[], Graph &db) {
+    for (int i = index;i < argc; i++) {
         if (!strcmp(argv[i], "count")) {
             count(db);
         } else if (!strcmp(argv[i], "getnode")) {
@@ -340,16 +342,20 @@ int main(int argc, char* argv[]) {
     if (argc < 3) {
         usage();
     }
+
     // init log
     initLog();
-    // load data
-    loadLdbcDataSet(argv[1]);
 
     // create database
     try {
-        if (!strcmp(argv[2], "create")) {
+        if (!strcmp(argv[1], "create")) {
+            if (argc < 2) {
+                usage();
+            }
+            // load data
+            loadLdbcDataSet(argv[1]);
             // create new database
-            Graph db("ldbc_benchmark", Graph::Create);
+            Graph db(argv[2], Graph::Create);
             Transaction tx(db, Transaction::ReadWrite);
             ID = StringID(ID_STR);
             db.create_index(Graph::NodeIndex, 0, ID_STR, PropertyType::Integer);
@@ -360,14 +366,13 @@ int main(int argc, char* argv[]) {
 
             insertEdgeBenchmark(db);
 
-            doWork(argc, argv, db);
+            doWork(4, argc, argv, db);
 
-        } else if (!strcmp(argv[2], "load")) {
+        } else if (!strcmp(argv[1], "load")) {
             // load ReadWrite
-            Graph db("ldbc_benchmark", Graph::ReadWrite);
+            Graph db(argv[2], Graph::ReadWrite);
 
-            doWork(argc, argv, db);
-
+            count(db);
         } else {
             usage();
         }
