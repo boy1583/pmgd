@@ -284,10 +284,61 @@ void deleteEdgeBenchmark(Graph &db) {
                     double(duration.count()) / edges.size())
 }
 
+void count(Graph &db) {
+    // count nodes and edges
+    {
+        Transaction tx(db, Transaction::ReadOnly);
+        // printf("## Trying plain get_nodes() and get_edges() iterator\n");
+        long long nodes_added = 0, edges_added = 0;
+        auto start_t = system_clock::now();
+        for (NodeIterator i = db.get_nodes(); i; i.next())
+            nodes_added++;
+        auto end_n = system_clock::now();
+        for (EdgeIterator i = db.get_edges(); i; i.next())
+            edges_added++;
+        auto end_e = system_clock::now();
+        auto duration_n = duration_cast<microseconds>(end_n - start_t);
+        auto duration_e = duration_cast<microseconds>(end_e - end_n);
+        LOG_DEBUG_WRITE("console", "edge count test => number of nodes: {} number of edges: {}", nodes_added, edges_added)
+        LOG_DEBUG_WRITE("console", "count node duration is {} microseconds ≈ {} s",
+                        double(duration_n.count()),
+                        double(duration_n.count()) * microseconds::period::num / microseconds::period::den)
+        LOG_DEBUG_WRITE("console", "count edge duration is {} microseconds ≈ {} s",
+                        double(duration_e.count()),
+                        double(duration_e.count()) * microseconds::period::num / microseconds::period::den)
+    }
+}
+
+void usage() {
+    printf("Usage: program [ldbc_dataset_path] [create/load] [count...getnode...getedge...updatenode...updateedge...deleteedge...deletenode]\n");
+    exit(0);
+}
+
+void doWork(int argc, char* argv[], Graph &db) {
+    for (int i = 2;i < argc; i++) {
+        if (!strcmp(argv[i], "count")) {
+            count(db);
+        } else if (!strcmp(argv[i], "getnode")) {
+            getNodeBenchmark(db);
+        } else if (!strcmp(argv[i], "getedge")) {
+            getEdgeBenchmark(db);
+        } else if (!strcmp(argv[i], "updatenode")) {
+            updateNodeBenchmark(db);
+        } else if (!strcmp(argv[i], "updateedge")) {
+            updateEdgeBenchmark(db);
+        } else if (!strcmp(argv[i], "deleteedge")) {
+            deleteEdgeBenchmark(db);
+        } else if (!strcmp(argv[i], "deletenode")) {
+            deleteNodeBenchmark(db);
+        } else {
+            usage();
+        }
+    }
+}
+
 int main(int argc, char* argv[]) {
     if (argc < 3) {
-        printf("Usage: program [ldbc_dataset_path] [create/update]\n");
-        exit(0);
+        usage();
     }
     // init log
     initLog();
@@ -296,7 +347,6 @@ int main(int argc, char* argv[]) {
 
     // create database
     try {
-
         if (!strcmp(argv[2], "create")) {
             // create new database
             Graph db("ldbc_benchmark", Graph::Create);
@@ -308,44 +358,18 @@ int main(int argc, char* argv[]) {
 
             insertNodeBenchmark(db);
 
-            // getNodeBenchmark(db);
-
             insertEdgeBenchmark(db);
 
-            // count nodes and edges
-            {
-                Transaction tx(db, Transaction::ReadOnly);
-                // printf("## Trying plain get_nodes() and get_edges() iterator\n");
-                long long nodes_added = 0, edges_added = 0;
-                auto start_t = system_clock::now();
-                for (NodeIterator i = db.get_nodes(); i; i.next())
-                    nodes_added++;
-                auto end_n = system_clock::now();
-                for (EdgeIterator i = db.get_edges(); i; i.next())
-                    edges_added++;
-                auto end_e = system_clock::now();
-                auto duration_n = duration_cast<microseconds>(end_n - start_t);
-                auto duration_e = duration_cast<microseconds>(end_e - end_n);
-                LOG_DEBUG_WRITE("console", "edge count test => number of nodes: {} number of edges: {}", nodes_added, edges_added)
-                LOG_DEBUG_WRITE("console", "count node duration is {} microseconds ≈ {} s",
-                                double(duration_n.count()),
-                                double(duration_n.count()) * microseconds::period::num / microseconds::period::den)
-                LOG_DEBUG_WRITE("console", "count edge duration is {} microseconds ≈ {} s",
-                                double(duration_e.count()),
-                                double(duration_e.count()) * microseconds::period::num / microseconds::period::den)
-            }
-            // getEdgeBenchmark(db);
-        } else {
+            doWork(argc, argv, db);
+
+        } else if (!strcmp(argv[2], "load")) {
             // load ReadWrite
             Graph db("ldbc_benchmark", Graph::ReadWrite);
 
-            updateNodeBenchmark(db);
+            doWork(argc, argv, db);
 
-            updateEdgeBenchmark(db);
-
-            deleteEdgeBenchmark(db);
-
-            deleteNodeBenchmark(db);
+        } else {
+            usage();
         }
     }
     catch (Exception e) {
