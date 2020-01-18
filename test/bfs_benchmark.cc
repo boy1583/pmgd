@@ -128,9 +128,9 @@ int main(int argc, char* argv[]) {
         Graph db(dbName.c_str(), Graph::ReadOnly);
 
         // 确定点是否存在
-        vector<StringID> ss;
         {
             Transaction tx(db, Transaction::ReadWrite);
+            vector<StringID> ss;
             for (auto s : sources) {
                 NodeIterator nodes = db.get_nodes(0, PropertyPredicate(StringID(ID_STR), PropertyPredicate::Eq, s));
                 if (nodes) {
