@@ -283,8 +283,8 @@ void deleteEdgeBenchmark(Graph &db) {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        printf("Usage: program [ldbc_dataset_path]\n");
+    if (argc < 3) {
+        printf("Usage: program [ldbc_dataset_path] [create/update]\n");
         exit(0);
     }
     // init log
@@ -295,20 +295,7 @@ int main(int argc, char* argv[]) {
     // create database
     try {
 
-        {
-            // load ReadWrite
-            Graph db("ldbc_benchmark", Graph::ReadWrite);
-
-            updateNodeBenchmark(db);
-
-            updateEdgeBenchmark(db);
-
-            deleteNodeBenchmark(db);
-
-            deleteEdgeBenchmark(db);
-        }
-
-        /*{
+        if (!strcmp(argv[2], "create")) {
             // create new database
             Graph db("ldbc_benchmark", Graph::Create);
             Transaction tx(db, Transaction::ReadWrite);
@@ -324,8 +311,19 @@ int main(int argc, char* argv[]) {
             insertEdgeBenchmark(db);
 
             // getEdgeBenchmark(db);
-        }*/
+        } else {
+            // load ReadWrite
+            Graph db("ldbc_benchmark", Graph::ReadWrite);
 
+            updateNodeBenchmark(db);
+
+            updateEdgeBenchmark(db);
+
+            deleteNodeBenchmark(db);
+
+            deleteEdgeBenchmark(db);
+
+        }
     }
     catch (Exception e) {
         print_exception(e);
