@@ -149,6 +149,7 @@ void insertNodeBenchmark(Graph &db) {
 void getNodeBenchmark(Graph  &db) {
     auto start_t = system_clock::now();
     for (auto &node : nodes) {
+        Transaction tx(db, Transaction::ReadOnly);
         get_node(db, node._id, nullptr);
     }
     auto end_t   = system_clock::now();
@@ -215,6 +216,7 @@ void insertEdgeBenchmark(Graph &db) {
 void getEdgeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
     for (auto &edge : edges) {
+        Transaction tx(db, Transaction::ReadOnly);
         get_edge(db, edge._id, nullptr);
     }
     auto end_t   = system_clock::now();
