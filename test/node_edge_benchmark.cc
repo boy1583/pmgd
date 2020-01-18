@@ -317,7 +317,7 @@ int main(int argc, char* argv[]) {
             // load ReadWrite
             Graph db("ldbc_benchmark", Graph::ReadWrite);
 
-            // updateNodeBenchmark(db);
+            updateNodeBenchmark(db);
 
             updateEdgeBenchmark(db);
 
