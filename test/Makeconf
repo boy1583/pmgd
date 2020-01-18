@@ -20,6 +20,7 @@ TEST_SRCS := $(addprefix test/, \
                          neighbortest.cc aborttest.cc \
                          test720.cc test750.cc test767.cc \
                          node_edge_benchmark.cc \
+                         property_benchmark.cc \
                          )
 
 # Derive a list of objects.
