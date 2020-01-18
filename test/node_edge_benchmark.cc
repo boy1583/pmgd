@@ -124,11 +124,14 @@ void loadLdbcDataSet(const char* ldbcPath) {
 void insertNodeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
     for (auto &n : nodes) {
+        Transaction tx(db, Transaction::ReadWrite);
         Node &node = db.add_node(StringID(n.xlabel.c_str()));
         for (auto &p : n.ps) {
             node.set_property(StringID(p.first.c_str()), p.second);
         }
+        tx.commit();
     }
+
     auto end_t   = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "node insert test (include property) => number of record: {}", nodes.size())
