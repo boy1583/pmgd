@@ -312,6 +312,28 @@ int main(int argc, char* argv[]) {
 
             insertEdgeBenchmark(db);
 
+            // count nodes and edges
+            {
+                Transaction tx(db, Transaction::ReadOnly);
+                // printf("## Trying plain get_nodes() and get_edges() iterator\n");
+                long long nodes_added = 0, edges_added = 0;
+                auto start_t = system_clock::now();
+                for (NodeIterator i = db.get_nodes(); i; i.next())
+                    nodes_added++;
+                auto end_n = system_clock::now();
+                for (EdgeIterator i = db.get_edges(); i; i.next())
+                    edges_added++;
+                auto end_e = system_clock::now();
+                auto duration_n = duration_cast<microseconds>(end_n - start_t);
+                auto duration_e = duration_cast<microseconds>(end_e - end_n);
+                LOG_DEBUG_WRITE("console", "edge count test => number of nodes: {} number of edges: {}", nodes_added, edges_added)
+                LOG_DEBUG_WRITE("console", "count node duration is {} microseconds ≈ {} s",
+                                double(duration_n.count()),
+                                double(duration_n.count()) * microseconds::period::num / microseconds::period::den)
+                LOG_DEBUG_WRITE("console", "count edge duration is {} microseconds ≈ {} s",
+                                double(duration_e.count()),
+                                double(duration_e.count()) * microseconds::period::num / microseconds::period::den)
+            }
             // getEdgeBenchmark(db);
         } else {
             // load ReadWrite
