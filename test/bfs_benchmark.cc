@@ -46,7 +46,7 @@ void bfs(Graph &db, uint64_t tag, int maxDep) {
             Node &next = (*it).get_destination();
             long long next_id = next.get_property(StringID(ID_STR)).int_value();
             if (!visted.count(next_id)) {
-                LOG_DEBUG_WRITE("console", "level:{} : {} -> {}", currentDep, id, next_id);
+                // LOG_DEBUG_WRITE("console", "level:{} : {} -> {}", currentDep, id, next_id);
                 // std::cout << it->SecondNode << " ";
                 visted.insert(next_id);
                 que2.push(next_id);
@@ -56,7 +56,7 @@ void bfs(Graph &db, uint64_t tag, int maxDep) {
             currentDep++;
             if (currentDep >= maxDep)
                 continue;
-            // LOG_DEBUG_WRITE("console", "node in depth:{} is {}", currentDep, que2.size())
+            LOG_DEBUG_WRITE("console", "node in depth:{} is {}", currentDep, que2.size())
             while(!que2.empty()) {
                 que.push(que2.front());
                 que2.pop();
@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
                     // ss.emplace_back((*nodes).get_tag());
                     LOG_DEBUG_WRITE("console", "node id:{} => {}", s, true)
                 } else {
-                    LOG_ERROR_WRITE("console", "node id:{} => {}", s, true)
+                    LOG_ERROR_WRITE("console", "node id:{} => {}", s, false)
                     exit(0);
                 }
             }
