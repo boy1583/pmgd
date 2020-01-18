@@ -321,10 +321,9 @@ int main(int argc, char* argv[]) {
 
             updateEdgeBenchmark(db);
 
-            deleteNodeBenchmark(db);
-
             deleteEdgeBenchmark(db);
 
+            deleteNodeBenchmark(db);
         }
     }
     catch (Exception e) {
