@@ -132,6 +132,7 @@ void insertNodeBenchmark(Graph &db) {
     for (auto &n : nodes) {
         Transaction tx(db, Transaction::ReadWrite);
         Node &node = db.add_node(StringID(n.xlabel.c_str()));
+        node.set_property(ID_STR, n._id);
         for (auto &p : n.ps) {
             node.set_property(StringID(p.first.c_str()), p.second);
         }
