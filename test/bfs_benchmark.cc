@@ -30,7 +30,7 @@ static const char ID_STR[] = "pmgd.loader.id";
 static StringID ID;
 
 void bfs(Graph &db, StringID tag, int maxDep) {
-    Transaction tx(db, Transaction::ReadWrite);
+    // Transaction tx(db, Transaction::ReadWrite);
     std::set<StringID> visted;
     std::queue<StringID> que;
     std::queue<StringID> que2;
@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
 
         // 确定点是否存在
         {
-            Transaction tx(db, Transaction::ReadWrite);
+            Transaction tx(db, Transaction::ReadOnly);
             vector<StringID> ss;
             for (auto s : sources) {
                 NodeIterator nodes = db.get_nodes(0, PropertyPredicate(StringID(ID_STR), PropertyPredicate::Eq, s));
@@ -148,25 +148,24 @@ int main(int argc, char* argv[]) {
                 tmp += ", ";
             }
             LOG_DEBUG_WRITE("console", "{}", tmp)
-        }
 
-        for (int dep = 2; dep <= 5; dep++) {
-            double totalSeconds = 0;
-            for (int i = 0;i < ss.size(); i++) {
-                auto &tag = ss[i];
-                auto start_t = system_clock::now();
-                bfs(db, tag, dep);
-                auto end_t = system_clock::now();
-                auto duration = duration_cast<microseconds>(end_t - start_t);
-                // auto ms = duration_cast<std::chrono::milliseconds>(end_t - start_t);
-                LOG_DEBUG_WRITE("console", "source node is {} (StringID:{}), BFS dep is {}, duration is {} microseconds ≈ {} s",
-                                sources[i], tag.name(), dep, double(duration.count()),
-                                double(duration.count()) * microseconds::period::num / microseconds::period::den);
-                totalSeconds += double(duration.count()) * microseconds::period::num / microseconds::period::den;
+            for (int dep = 2; dep <= 5; dep++) {
+                double totalSeconds = 0;
+                for (int i = 0;i < ss.size(); i++) {
+                    auto &tag = ss[i];
+                    auto start_t = system_clock::now();
+                    bfs(db, tag, dep);
+                    auto end_t = system_clock::now();
+                    auto duration = duration_cast<microseconds>(end_t - start_t);
+                    // auto ms = duration_cast<std::chrono::milliseconds>(end_t - start_t);
+                    LOG_DEBUG_WRITE("console", "source node is {} (StringID:{}), BFS dep is {}, duration is {} microseconds ≈ {} s",
+                                    sources[i], tag.name(), dep, double(duration.count()),
+                                    double(duration.count()) * microseconds::period::num / microseconds::period::den);
+                    totalSeconds += double(duration.count()) * microseconds::period::num / microseconds::period::den;
+                }
+                LOG_DEBUG_WRITE("console", "===> BFS dep is {}, total duration is {} s, {} s per node. <===", dep, totalSeconds, totalSeconds / sources.size())
             }
-            LOG_DEBUG_WRITE("console", "===> BFS dep is {}, total duration is {} s, {} s per node. <===", dep, totalSeconds, totalSeconds / sources.size())
         }
-
     } catch (Exception e) {
         print_exception(e);
         return 1;
