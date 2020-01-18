@@ -40,20 +40,26 @@ long long num_edges = 0;
 void node_added(Node &);
 void edge_added(Edge &);
 
+static Node &get_node(Graph &db, long long id,
+                      std::function<void(Node &)> node_func);
+
+static Edge &get_edge(Graph &db, long long id,
+                      std::function<void(Edge &)> edge_func);
+
 // typedef std::vector<std::pair<std::string, std::string>> PropertyList;
 
 class LDBCNode {
 public:
-    uint64_t        _id;
+    long long        _id;
     string          xlabel;
     std::vector<std::pair<std::string, std::string>>    ps;
 };
 
 class LDBCEdge {
 public:
-    uint64_t    _id;
-    uint64_t    _inV;
-    uint64_t    _outV;
+    long long    _id;
+    long long    _inV;
+    long long    _outV;
     string      _label;
 };
 
@@ -69,12 +75,12 @@ void loadLdbcDataSet(const char* ldbcPath) {
     Document d;
     d.ParseStream<0, UTF8<>, FileReadStream>(is);
 
-    uint64_t maxE = 0, maxV = 0;
+    long long maxE = 0, maxV = 0;
 
     // std::cout << d["mode"].GetString();
     for (auto& v : d["vertices"].GetArray()) {
         LDBCNode node;
-        node._id = v["_id"].GetUint64() + 1ULL;
+        node._id = v["_id"].GetInt64() + 1ULL;
         maxV = max(maxV, node._id);
         node.xlabel = v["xlabel"].GetString();
         auto &empty = node.ps;
@@ -105,11 +111,11 @@ void loadLdbcDataSet(const char* ldbcPath) {
 
     for (auto& e : d["edges"].GetArray()) {
         LDBCEdge edge;
-        edge._id = e["_id"].GetUint64();
+        edge._id = e["_id"].GetInt64();
         assert(edge._id != 0);
         maxE = max(maxE, edge._id);
-        edge._inV = e["_inV"].GetUint64() + 1ULL;
-        edge._outV = e["_outV"].GetUint64() + 1ULL;
+        edge._inV = e["_inV"].GetInt64() + 1ULL;
+        edge._outV = e["_outV"].GetInt64() + 1ULL;
         edge._label = e["_label"].GetString();
 
         // _outV _id _inV _label
@@ -138,12 +144,12 @@ void insertNodeBenchmark(Graph &db) {
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
                     double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den, double(duration.count()) / nodes.size())
 }
-/*
+
 // 查询点
-void getNodeBenchmark(euler_db &db) {
+void getNodeBenchmark(Graph  &db) {
     auto start_t = system_clock::now();
     for (auto &node : nodes) {
-        db.GetNode(node._id);
+        get_node(db, node._id, nullptr);
     }
     auto end_t   = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
@@ -152,6 +158,7 @@ void getNodeBenchmark(euler_db &db) {
                     double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den, double(duration.count()) / nodes.size())
 }
 
+/*
 // 修改点(label)
 void updateNodeBenchmark(euler_db &db) {
     std::string label = "newlabel";
@@ -180,25 +187,35 @@ void deleteNodeBenchmark(euler_db &db) {
 }
 
 // (再次插入点)
-
+*/
 // 插入边
-void insertEdgeBenchmark(euler_db &db) {
+void insertEdgeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
-    for (auto &edge : edges) {
-        db.AddEdge(edge._id, edge._outV, edge._inV, edge._label);
+    for (auto &e : edges) {
+        Transaction tx(db, Transaction::ReadWrite);
+
+        Node &src = get_node(db, e._outV, nullptr);
+        Node &dst = get_node(db, e._inV, nullptr);
+        Edge &edge = db.add_edge(src, dst, "labelE");
+
+        edge.set_property(ID_STR, e._id);
+        edge.set_property(StringID("_label"), e._label);
+
+        tx.commit();
     }
     auto end_t   = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "edge insert test (include property) => number of record: {}", edges.size())
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
                     double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den, double(duration.count()) / edges.size())
+
 }
 
 // 查询边
-void getEdgeBenchmark(euler_db &db) {
+void getEdgeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
     for (auto &edge : edges) {
-        db.GetEdge(edge._id);
+        get_edge(db, edge._id, nullptr);
     }
     auto end_t   = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
@@ -206,7 +223,7 @@ void getEdgeBenchmark(euler_db &db) {
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
                     double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den, double(duration.count()) / edges.size())
 }
-
+/*
 // 修改边
 void updateEdgeBenchmark(euler_db &db) {
     std::string label = "newlabel";
@@ -257,6 +274,12 @@ int main(int argc, char* argv[]) {
 
         insertNodeBenchmark(db);
 
+        getNodeBenchmark(db);
+
+        insertEdgeBenchmark(db);
+
+        getEdgeBenchmark(db);
+
 //        auto start_t = system_clock::now();
 //        auto end_t   = system_clock::now();
 //        auto duration = duration_cast<microseconds>(end_t - start_t);
@@ -277,4 +300,44 @@ void node_added(Node &n)
 void edge_added(Edge &e)
 {
     ++num_edges;
+}
+
+static Node &get_node(Graph &db, long long id,
+                      std::function<void(Node &)> node_func)
+{
+    NodeIterator nodes = db.get_nodes(0,
+                                      PropertyPredicate(ID_STR, PropertyPredicate::Eq, id));
+    if (nodes) return *nodes;
+
+    std::cerr << "node not found id:" << id << "\n";
+
+    assert(false);
+
+    // Node not found; add it
+    // Node &node = db.add_node(0);
+    /*Node &node = db.add_node("labelV");
+    node.set_property(ID_STR, id);
+    if (node_func)
+        node_func(node);
+    return node;*/
+}
+
+static Edge &get_edge(Graph &db, long long id,
+                      std::function<void(Edge &)> edge_func)
+{
+    EdgeIterator edges = db.get_edges(0,
+                                      PropertyPredicate(ID_STR, PropertyPredicate::Eq, id));
+    if (edges) return *edges;
+
+    std::cerr << "edge not found id:" << id << "\n";
+
+    assert(false);
+
+    // Node not found; add it
+    // Node &node = db.add_node(0);
+    /*Node &node = db.add_node("labelV");
+    node.set_property(ID_STR, id);
+    if (node_func)
+        node_func(node);
+    return node;*/
 }
