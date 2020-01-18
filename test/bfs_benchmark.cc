@@ -130,10 +130,9 @@ int main(int argc, char* argv[]) {
         // 确定点是否存在
         vector<StringID> ss;
         {
-            Transaction tx(db, Transaction::ReadOnly);
-            ID = StringID(ID_STR);
+            Transaction tx(db, Transaction::ReadWrite);
             for (auto s : sources) {
-                NodeIterator nodes = db.get_nodes(0, PropertyPredicate(ID, PropertyPredicate::Eq, s));
+                NodeIterator nodes = db.get_nodes(0, PropertyPredicate(StringID(ID_STR), PropertyPredicate::Eq, s));
                 if (nodes) {
                     ss.emplace_back((*nodes).get_tag());
                     LOG_DEBUG_WRITE("console", "node id:{} => {}", s, true)
