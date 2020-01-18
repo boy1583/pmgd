@@ -30,7 +30,7 @@ static const char ID_STR[] = "pmgd.loader.id";
 static StringID ID;
 
 void bfs(Graph &db, StringID tag, int maxDep) {
-    Transaction tx(db, Transaction::ReadOnly);
+    Transaction tx(db, Transaction::ReadWrite);
     std::set<StringID> visted;
     std::queue<StringID> que;
     std::queue<StringID> que2;
