@@ -264,7 +264,7 @@ int main(int argc, char* argv[]) {
 
     // create database
     try {
-        Graph db("node_edge_benchmark", Graph::Create);
+        Graph db("ldbc_benchmark", Graph::Create);
 
         Transaction tx(db, Transaction::ReadWrite);
         ID = StringID(ID_STR);
