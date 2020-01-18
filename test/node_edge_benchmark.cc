@@ -67,7 +67,7 @@ std::vector<LDBCNode> nodes;
 std::vector<LDBCEdge> edges;
 
 void loadLdbcDataSet(const char* ldbcPath) {
-    FILE* fp = fopen(ldbcPath, "r");
+    FILE *fp = fopen(ldbcPath, "r");
 
     char readBuffer[65536];
     FileReadStream is(fp, readBuffer, sizeof(readBuffer));
@@ -78,7 +78,7 @@ void loadLdbcDataSet(const char* ldbcPath) {
     long long maxE = 0, maxV = 0;
 
     // std::cout << d["mode"].GetString();
-    for (auto& v : d["vertices"].GetArray()) {
+    for (auto &v : d["vertices"].GetArray()) {
         LDBCNode node;
         node._id = v["_id"].GetInt64() + 1ULL;
         maxV = max(maxV, node._id);
@@ -109,7 +109,7 @@ void loadLdbcDataSet(const char* ldbcPath) {
     }
     LOG_INFO_WRITE("console", "Load {} nodes. maxNodeId is {}", nodes.size(), maxV)
 
-    for (auto& e : d["edges"].GetArray()) {
+    for (auto &e : d["edges"].GetArray()) {
         LDBCEdge edge;
         edge._id = e["_id"].GetInt64();
         assert(edge._id != 0);
@@ -139,11 +139,13 @@ void insertNodeBenchmark(Graph &db) {
         tx.commit();
     }
 
-    auto end_t   = system_clock::now();
+    auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "node insert test (include property) => number of record: {}", nodes.size())
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
-                    double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den, double(duration.count()) / nodes.size())
+                    double(duration.count()),
+                    double(duration.count()) * microseconds::period::num / microseconds::period::den,
+                    double(duration.count()) / nodes.size())
 }
 
 // 查询点
@@ -153,43 +155,55 @@ void getNodeBenchmark(Graph  &db) {
         Transaction tx(db, Transaction::ReadOnly);
         get_node(db, node._id, nullptr);
     }
-    auto end_t   = system_clock::now();
+    auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "node get test (include property) => number of record: {}", nodes.size())
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
-                    double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den, double(duration.count()) / nodes.size())
+                    double(duration.count()),
+                    double(duration.count()) * microseconds::period::num / microseconds::period::den,
+                    double(duration.count()) / nodes.size())
 }
 
-/*
+
 // 修改点(label)
-void updateNodeBenchmark(euler_db &db) {
+void updateNodeBenchmark(Graph &db) {
     std::string label = "newlabel";
     auto start_t = system_clock::now();
-    for (auto &node : nodes) {
-        db.UpdateNode(node._id, label, node.ps);
+    for (auto &n : nodes) {
+        Transaction tx(db, Transaction::ReadWrite);
+        Node &node = get_node(db, n._id, nullptr);
+        node.set_property(StringID("xlabel"), label);
+        tx.commit();
     }
-    auto end_t   = system_clock::now();
+    auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "node update test (include property) => number of record: {}", nodes.size())
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
-                    double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den, double(duration.count()) / nodes.size())
+                    double(duration.count()),
+                    double(duration.count()) * microseconds::period::num / microseconds::period::den,
+                    double(duration.count()) / nodes.size())
 }
 
 // 删除点
-void deleteNodeBenchmark(euler_db &db) {
+void deleteNodeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
-    for (auto &node : nodes) {
-        db.DeleteNode(node._id);
+    for (auto &n : nodes) {
+        Transaction tx(db, Transaction::ReadWrite);
+        Node &node = get_node(db, n._id, nullptr);
+        db.remove(node);
+        tx.commit();
     }
-    auto end_t   = system_clock::now();
+    auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "node delete test (include property) => number of record: {}", nodes.size())
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
-                    double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den, double(duration.count()) / nodes.size())
+                    double(duration.count()),
+                    double(duration.count()) * microseconds::period::num / microseconds::period::den,
+                    double(duration.count()) / nodes.size())
 }
 
 // (再次插入点)
-*/
+
 // 插入边
 void insertEdgeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
@@ -205,11 +219,13 @@ void insertEdgeBenchmark(Graph &db) {
 
         tx.commit();
     }
-    auto end_t   = system_clock::now();
+    auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "edge insert test (include property) => number of record: {}", edges.size())
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
-                    double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den, double(duration.count()) / edges.size())
+                    double(duration.count()),
+                    double(duration.count()) * microseconds::period::num / microseconds::period::den,
+                    double(duration.count()) / edges.size())
 
 }
 
@@ -220,40 +236,51 @@ void getEdgeBenchmark(Graph &db) {
         Transaction tx(db, Transaction::ReadOnly);
         get_edge(db, edge._id, nullptr);
     }
-    auto end_t   = system_clock::now();
+    auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "edge get test (include property) => number of record: {}", edges.size())
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
-                    double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den, double(duration.count()) / edges.size())
+                    double(duration.count()),
+                    double(duration.count()) * microseconds::period::num / microseconds::period::den,
+                    double(duration.count()) / edges.size())
 }
-/*
+
 // 修改边
-void updateEdgeBenchmark(euler_db &db) {
+void updateEdgeBenchmark(Graph &db) {
     std::string label = "newlabel";
     auto start_t = system_clock::now();
-    for (auto &edge : edges) {
-        db.UpdateEdge(edge._id, label);
+    for (auto &e : edges) {
+        Transaction tx(db, Transaction::ReadWrite);
+        Edge &edge = get_edge(db, e._id, nullptr);
+        edge.set_property(StringID("_label"), e._label);
+        tx.commit();
     }
-    auto end_t   = system_clock::now();
+    auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "edge update test (include property) => number of record: {}", edges.size())
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
-                    double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den, double(duration.count()) / edges.size())
+                    double(duration.count()),
+                    double(duration.count()) * microseconds::period::num / microseconds::period::den,
+                    double(duration.count()) / edges.size())
 }
 
-
 // 删除边
-void deleteEdgeBenchmark(euler_db &db) {
+void deleteEdgeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
-    for (auto &edge : edges) {
-        db.DeleteEdge(edge._id);
+    for (auto &e : edges) {
+        Transaction tx(db, Transaction::ReadWrite);
+        Edge &edge = get_edge(db, e._id, nullptr);
+        db.remove(edge);
+        tx.commit();
     }
-    auto end_t   = system_clock::now();
+    auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
-    LOG_DEBUG_WRITE("console", "edge delete test (include property) => number of record: {}", nodes.size())
+    LOG_DEBUG_WRITE("console", "edge delete test (include property) => number of record: {}", edges.size())
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
-                    double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den, double(duration.count()) / edges.size())
-}*/
+                    double(duration.count()),
+                    double(duration.count()) * microseconds::period::num / microseconds::period::den,
+                    double(duration.count()) / edges.size())
+}
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -267,26 +294,38 @@ int main(int argc, char* argv[]) {
 
     // create database
     try {
-        Graph db("ldbc_benchmark", Graph::Create);
 
-        Transaction tx(db, Transaction::ReadWrite);
-        ID = StringID(ID_STR);
-        db.create_index(Graph::NodeIndex, 0, ID_STR, PropertyType::Integer);
-        db.create_index(Graph::EdgeIndex, 0, ID_STR, PropertyType::Integer);
-        tx.commit();
+        {
+            // load ReadWrite
+            Graph db("ldbc_benchmark", Graph::ReadWrite);
 
-        insertNodeBenchmark(db);
+            updateNodeBenchmark(db);
 
-        getNodeBenchmark(db);
+            updateEdgeBenchmark(db);
 
-        insertEdgeBenchmark(db);
+            deleteNodeBenchmark(db);
 
-        getEdgeBenchmark(db);
+            deleteEdgeBenchmark(db);
+        }
 
-//        auto start_t = system_clock::now();
-//        auto end_t   = system_clock::now();
-//        auto duration = duration_cast<microseconds>(end_t - start_t);
-//        printf("load finished. duration is %f microseconds ≈ %f s, \n", double(duration.count()), double(duration.count()) * microseconds::period::num / microseconds::period::den);
+        /*{
+            // create new database
+            Graph db("ldbc_benchmark", Graph::Create);
+            Transaction tx(db, Transaction::ReadWrite);
+            ID = StringID(ID_STR);
+            db.create_index(Graph::NodeIndex, 0, ID_STR, PropertyType::Integer);
+            db.create_index(Graph::EdgeIndex, 0, ID_STR, PropertyType::Integer);
+            tx.commit();
+
+            insertNodeBenchmark(db);
+
+            // getNodeBenchmark(db);
+
+            insertEdgeBenchmark(db);
+
+            // getEdgeBenchmark(db);
+        }*/
+
     }
     catch (Exception e) {
         print_exception(e);
