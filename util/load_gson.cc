@@ -177,7 +177,7 @@ static void set_property(T *elem, const char *pkey, Json::Value &pval)
             {
                 // unexact it
                 if (pval.isMember("type") && pval.isMember("value")) {
-                    set_property(elem, "value", pval["value"]);
+                    set_property(elem, pkey, pval["value"]);
                 }
             }
             break;
