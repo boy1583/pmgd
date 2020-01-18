@@ -169,12 +169,12 @@ void getNodeBenchmark(Graph  &db) {
 void updateNodeBenchmark(Graph &db) {
     std::string label = "newlabel";
     auto start_t = system_clock::now();
+    Transaction tx(db, Transaction::ReadWrite);
     for (auto &n : nodes) {
-        Transaction tx(db, Transaction::ReadWrite);
         Node &node = get_node(db, n._id, nullptr);
         node.set_property(StringID("xlabel"), label);
-        tx.commit();
     }
+    tx.commit();
     auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "node update test (include property) => number of record: {}", nodes.size())
