@@ -29,26 +29,27 @@ using namespace PMGD;
 static const char ID_STR[] = "pmgd.loader.id";
 static StringID ID;
 
-void bfs(Graph &db, StringID tag, int maxDep) {
+void bfs(Graph &db, uint64_t tag, int maxDep) {
     // Transaction tx(db, Transaction::ReadWrite);
-    std::set<StringID> visted;
-    std::queue<StringID> que;
-    std::queue<StringID> que2;
+    std::set<uint64_t> visted;
+    std::queue<uint64_t> que;
+    std::queue<uint64_t> que2;
     visted.insert(tag);
     que.push(tag);
     int currentDep = 1;
     while(!que.empty() && currentDep < maxDep) {
-        StringID id = que.front();
+        uint64_t id = que.front();
         que.pop();
 
-        Node &n = *(db.get_nodes(id));
+        Node &n = *(db.get_nodes(0, PropertyPredicate(StringID(ID_STR), PropertyPredicate::Eq, (long long)id)));
         for (EdgeIterator it = n.get_edges(Direction::Outgoing); it; it.next()) {
             Node &next = (*it).get_destination();
-            if (!visted.count(next.get_tag())) {
-                LOG_DEBUG_WRITE("console", "level:{} : {} -> {}", currentDep, n.get_tag().name(), next.get_tag().name());
+            long long next_id = next.get_property(StringID(ID_STR)).int_value();
+            if (!visted.count(next_id)) {
+                LOG_DEBUG_WRITE("console", "level:{} : {} -> {}", currentDep, id, next_id);
                 // std::cout << it->SecondNode << " ";
-                visted.insert(next.get_tag());
-                que2.push(next.get_tag());
+                visted.insert(next_id);
+                que2.push(next_id);
             }
         }
         if (que.empty()) {
@@ -69,7 +70,7 @@ void bfs(Graph &db, StringID tag, int maxDep) {
 int main(int argc, char* argv[]) {
     // load json data into DB
     if (argc < 3) {
-        printf("Usage: program [db path] [ldbc/freebase/twitter/graph500]\n");
+        printf("Usage: program [db_name] [ldbc/freebase/twitter/graph500]\n");
         return -1;
     }
     initLog();
@@ -92,8 +93,12 @@ int main(int argc, char* argv[]) {
         LOG_DEBUG_WRITE("console", "use graph500 dataset lid...")
         vector<long long> tmp = {966892,68103,505800,194272,218438,66102,460371,696911,346984,1189161};
         sources = tmp;
+    } else if (!strcmp(argv[2], "sample")) {
+        LOG_DEBUG_WRITE("console", "use sample dataset lid...(only 1)")
+        vector<long long> tmp = {1};
+        sources = tmp;
     } else {
-        printf("unknow dataset lids, use 1 as source node, create sample graph.\n");
+        printf("create sample graph...\n");
         vector<long long> tmp = {1};
         sources = tmp;
 
@@ -118,6 +123,7 @@ int main(int argc, char* argv[]) {
             db.add_edge(n249, n977, 390);
             db.add_edge(n1, n434, 241);
             tx.commit();
+            exit(0);
         } catch (Exception e) {
             print_exception(e);
             return 1;
@@ -130,11 +136,11 @@ int main(int argc, char* argv[]) {
         // 确定点是否存在
         {
             Transaction tx(db, Transaction::ReadOnly);
-            vector<StringID> ss;
+            // vector<uint64_t> ss;
             for (auto s : sources) {
                 NodeIterator nodes = db.get_nodes(0, PropertyPredicate(StringID(ID_STR), PropertyPredicate::Eq, s));
                 if (nodes) {
-                    ss.emplace_back((*nodes).get_tag());
+                    // ss.emplace_back((*nodes).get_tag());
                     LOG_DEBUG_WRITE("console", "node id:{} => {}", s, true)
                 } else {
                     LOG_ERROR_WRITE("console", "node id:{} => {}", s, true)
@@ -151,15 +157,14 @@ int main(int argc, char* argv[]) {
 
             for (int dep = 2; dep <= 5; dep++) {
                 double totalSeconds = 0;
-                for (int i = 0;i < ss.size(); i++) {
-                    auto &tag = ss[i];
+                for (int i = 0;i < sources.size(); i++) {
                     auto start_t = system_clock::now();
-                    bfs(db, tag, dep);
+                    bfs(db, sources[i], dep);
                     auto end_t = system_clock::now();
                     auto duration = duration_cast<microseconds>(end_t - start_t);
                     // auto ms = duration_cast<std::chrono::milliseconds>(end_t - start_t);
-                    LOG_DEBUG_WRITE("console", "source node is {} (StringID:{}), BFS dep is {}, duration is {} microseconds ≈ {} s",
-                                    sources[i], tag.name(), dep, double(duration.count()),
+                    LOG_DEBUG_WRITE("console", "source node is {}, BFS dep is {}, duration is {} microseconds ≈ {} s",
+                                    sources[i], dep, double(duration.count()),
                                     double(duration.count()) * microseconds::period::num / microseconds::period::den);
                     totalSeconds += double(duration.count()) * microseconds::period::num / microseconds::period::den;
                 }
