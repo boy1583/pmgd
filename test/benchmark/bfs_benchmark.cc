@@ -101,7 +101,6 @@ int main(int argc, char* argv[]) {
         printf("create sample graph...\n");
         vector<long long> tmp = {1};
         sources = tmp;
-
         dbName = "sample";
         try {
             Graph db(dbName.c_str(), Graph::Create);

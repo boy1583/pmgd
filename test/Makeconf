@@ -19,9 +19,10 @@ TEST_SRCS := $(addprefix test/, \
                          rotest.cc BindingsTest.java DateTest.java \
                          neighbortest.cc aborttest.cc \
                          test720.cc test750.cc test767.cc \
-                         node_edge_benchmark.cc \
-                         property_benchmark.cc \
-                         bfs_benchmark.cc \
+                         benchmark/node_edge_benchmark.cc \
+                         benchmark/property_benchmark.cc \
+                         benchmark/bfs_benchmark.cc \
+                         benchmark/NN-both-filtered.cc \
                          )
 
 # Derive a list of objects.
