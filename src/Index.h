@@ -55,7 +55,13 @@ namespace PMGD {
         void add(const Property &p, void *n, GraphImpl *db);
         void remove(const Property &p, void *n, GraphImpl *db);
         void check_type(const PropertyType ptype)
-            { if (_ptype != ptype) throw PMGDException(PropertyTypeMismatch); }
+            { if (_ptype != ptype) {
+                    printf("%d \t %d\n", (int)_ptype, (int)ptype);
+//                NoValue = 1, Boolean, Integer, String,
+//                        Float, Time, Blob
+                    throw PMGDException(PropertyTypeMismatch);
+            }
+                 }
 
         // Use a locale pointer here so that callers, where locale is
         // irrelevant, do not need to acquire it from the GraphImpl object.

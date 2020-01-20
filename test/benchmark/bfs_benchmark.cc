@@ -104,24 +104,71 @@ int main(int argc, char* argv[]) {
         dbName = "sample";
         try {
             Graph db(dbName.c_str(), Graph::Create);
-            Transaction tx(db, Transaction::ReadWrite);
-            Node &n1 = db.add_node(1);
-            Node &n149 = db.add_node(149);
-            Node &n434 = db.add_node(434);
-            Node &n977 = db.add_node(977);
-            Node &n411 = db.add_node(411);
-            Node &n249 = db.add_node(249);
-            Node &n641 = db.add_node(641);
+            {
+                Transaction tx(db, Transaction::ReadWrite);
+                ID = StringID(ID_STR);
+                db.create_index(Graph::NodeIndex, 0, ID_STR, PropertyType::Integer);
+                db.create_index(Graph::EdgeIndex, 0, ID_STR, PropertyType::Integer);
+                tx.commit();
+            }
+            {
+                Transaction tx(db, Transaction::ReadWrite);
+                Node &n1 = db.add_node("person");
+                n1.set_property(ID, 1LL);
+                 n1.set_property("name", "marko");
+                 n1.set_property("age", 29);
 
-            db.add_edge(n1, n434, 723);
-            db.add_edge(n1, n977, 626);
-            db.add_edge(n411, n1, 339);
-            db.add_edge(n1, n641, 700);
-            db.add_edge(n149, n1, 130);
-            db.add_edge(n434, n249, 551);
-            db.add_edge(n249, n977, 390);
-            db.add_edge(n1, n434, 241);
-            tx.commit();
+                Node &n2 = db.add_node("person");
+                n2.set_property(ID, 2LL);
+                n2.set_property("name", "vadas");
+                n2.set_property("age", 27);
+
+                Node &n3 = db.add_node("software");
+                n3.set_property(ID, 3LL);
+                n3.set_property("name", "lop");
+                n3.set_property("lang", "java");
+
+                Node &n4 = db.add_node("person");
+                n4.set_property(ID, 4LL);
+                n4.set_property("name", "josh");
+                n4.set_property("age", 32);
+
+                Node &n5 = db.add_node("software");
+                n5.set_property(ID, 5LL);
+                n5.set_property("name", "ripple");
+                n5.set_property("lang", "java");
+
+                Node &n6 = db.add_node("person");
+                n6.set_property(ID, 6LL);
+                n6.set_property("name", "peter");
+                n6.set_property("age", 35);
+
+                Edge &e7 = db.add_edge(n1, n2, "knows");
+                e7.set_property(ID, 7LL);
+                e7.set_property("weight", 0.5);
+
+                Edge &e8 = db.add_edge(n1, n4, "knows");
+                e8.set_property(ID, 8LL);
+                e8.set_property("weight", 1.0);
+
+                Edge &e9 = db.add_edge(n1, n3, "created");
+                e9.set_property(ID, 9LL);
+                e9.set_property("weight", 0.4);
+
+                Edge &e10 = db.add_edge(n4, n5, "created");
+                e10.set_property(ID, 10LL);
+                e10.set_property("weight", 1.0);
+
+                Edge &e11 = db.add_edge(n4, n3, "created");
+                e11.set_property(ID, 11LL);
+                e11.set_property("weight", 0.4);
+
+                Edge &e12 = db.add_edge(n6, n3, "created");
+                e12.set_property(ID, 12LL);
+                e12.set_property("weight", 0.2);
+
+                tx.commit();
+            }
             exit(0);
         } catch (Exception e) {
             print_exception(e);

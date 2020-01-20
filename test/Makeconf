@@ -23,6 +23,8 @@ TEST_SRCS := $(addprefix test/, \
                          benchmark/property_benchmark.cc \
                          benchmark/bfs_benchmark.cc \
                          benchmark/NN-both-filtered.cc \
+                         benchmark/k-degree-both.cc \
+                         benchmark/shortest-path.cc \
                          )
 
 # Derive a list of objects.
