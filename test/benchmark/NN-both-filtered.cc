@@ -50,7 +50,8 @@ int main(int argc, char* argv[]) {
             ids = {90775171808048LL,95575470755348LL,81707782495348LL,80669087845748LL,48525481515448LL,57676777527448LL,57505683687148LL,499084754948LL,68875188845748LL,505274954948LL};
             labels = {"/m/04ykw93","/m/04ykw7r","/m/0bf4xgr","/m/0wz7dh2","/m/03z9618","/m/01xs0hs","/m/02kb2_q","/m/07w8036","/m/01xxxz7","/m/05h9s4_"};
         } else if (dataset == "twitter") {
-
+            ids = {239261,7713390,6838192,5378052,3581806,4422251,3303191,7771631,5901685,8395972};
+            labels = {"labelE"};
         } else if (dataset == "graph500") {
 
         } else if (dataset == "sample") {

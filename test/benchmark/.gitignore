@@ -1,0 +1,7 @@
+bfs_benchmark
+k-degree-both
+NN-both-filtered
+node_edge_benchmark
+property_benchmark
+./*.d
+./*.o

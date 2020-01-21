@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
     } else if (dataset == "freebase") {
         ids = {90775171808048LL,95575470755348LL,81707782495348LL,80669087845748LL,48525481515448LL,57676777527448LL,57505683687148LL,499084754948LL,68875188845748LL,505274954948LL};
     } else if (dataset == "twitter") {
-
+        ids = {239261,7713390,6838192,5378052,3581806,4422251,3303191,7771631,5901685,8395972};
     } else if (dataset == "graph500") {
 
     } else {
@@ -56,10 +56,6 @@ int main(int argc, char* argv[]) {
             long long src = ids[i];
             long long dst = ids[j];
             // from src to dst
-
-
-
-
 
 
         }

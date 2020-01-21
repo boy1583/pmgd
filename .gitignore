@@ -7,3 +7,5 @@ cmake-build-debug
 test/*.class
 
 test/*test
+
+bin
