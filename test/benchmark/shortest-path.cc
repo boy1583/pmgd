@@ -21,7 +21,7 @@ static const char ID_STR[] = "pmgd.loader.id";
 static StringID ID;
 
 void usage() {
-    printf("Usage: program [db_name] [ldbc/freebase/twitter/graph500]\n");
+    printf("Usage: program [db_name] [ldbc/freebase/mico/yeast]\n");
     exit(0);
 }
 
@@ -90,13 +90,13 @@ int main(int argc, char* argv[]) {
 
     vector<long long> ids;
     if (dataset == "ldbc") {
-        ids = {871871,562439,1022837,842648,399882,519531,1148153,449638,411950,1257602};
+        ids = {168062,126101,2900,164352,95984,115510,18809,103863,97894,32702};
     } else if (dataset == "freebase") {
-        ids = {90775171808048LL,95575470755348LL,81707782495348LL,80669087845748LL,48525481515448LL,57676777527448LL,57505683687148LL,499084754948LL,68875188845748LL,505274954948LL};
-    } else if (dataset == "twitter") {
-        ids = {239261,7713390,6838192,5378052,3581806,4422251,3303191,7771631,5901685,8395972};
-    } else if (dataset == "graph500") {
-
+        ids = {1484158,63957,624478,1005153,1845599,1160813,1554886,1385143,147440,650644};
+    } else if (dataset == "mico") {
+        ids = {10693,59896,10464,33317,95783,79938,92858,86993,14637,94686};
+    } else if (dataset == "yeast") {
+        ids = {517,831,541,313,1941,2263,1079,1883,349,1850};
     } else if (dataset == "sample") {
         if (argc < 6) {
             printf("please apply [src] [dst] [maxDepth] to the end of params.\n");
@@ -134,9 +134,4 @@ int main(int argc, char* argv[]) {
         print_exception(e);
         return 1;
     }
-
-
-
-
-
 }

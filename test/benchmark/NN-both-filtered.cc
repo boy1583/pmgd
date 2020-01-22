@@ -20,10 +20,10 @@ using namespace chrono;
 static const char ID_STR[] = "pmgd.loader.id";
 static StringID ID;
 
-// 获取一个点的所有了label在label array中的边的数量
+// 获取一个点的边的label在label array中的数量
 
 void usage() {
-    printf("Usage: program [db_name] [ldbc/freebase/twitter/graph500]\n");
+    printf("Usage: program [db_name] [ldbc/freebase/mico/yeast]\n");
     exit(0);
 }
 
@@ -44,16 +44,17 @@ int main(int argc, char* argv[]) {
         vector<long long> ids;
         set<string> labels;
         if (dataset == "ldbc") {
-            ids = {871871,562439,1022837,842648,399882,519531,1148153,449638,411950,1257602};
+            ids = {168062,126101,2900,164352,95984,115510,18809,103863,97894,32702};
             labels = {"hasInterest","likes","hasType","hasTag","hasCreator","replyOf","containerOf","studyAt","isLocatedIn","isSubclassOf"};
         } else if (dataset == "freebase") {
-            ids = {90775171808048LL,95575470755348LL,81707782495348LL,80669087845748LL,48525481515448LL,57676777527448LL,57505683687148LL,499084754948LL,68875188845748LL,505274954948LL};
+            ids = {1484158,63957,624478,1005153,1845599,1160813,1554886,1385143,147440,650644};
             labels = {"/m/04ykw93","/m/04ykw7r","/m/0bf4xgr","/m/0wz7dh2","/m/03z9618","/m/01xs0hs","/m/02kb2_q","/m/07w8036","/m/01xxxz7","/m/05h9s4_"};
-        } else if (dataset == "twitter") {
-            ids = {239261,7713390,6838192,5378052,3581806,4422251,3303191,7771631,5901685,8395972};
-            labels = {"labelE"};
-        } else if (dataset == "graph500") {
-
+        } else if (dataset == "mico") {
+            ids = {10693,59896,10464,33317,95783,79938,92858,86993,14637,94686};
+            labels = {"75","87","30","27","23","10","14","76","58","99"};
+        } else if (dataset == "yeast") {
+            ids = {517,831,541,313,1941,2263,1079,1883,349,1850};
+            labels = {"M-T","D-A","P-E","A-M","F-O","P-M","M-C","M-E","G-F","E-E"};
         } else if (dataset == "sample") {
             ids = {1};
             labels = {"knows"};
