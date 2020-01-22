@@ -75,7 +75,7 @@ void bfs(Graph &db, uint64_t tag, int maxDep) {
 int main(int argc, char* argv[]) {
     // load json data into DB
     if (argc < 3) {
-        printf("Usage: program [db_name] [ldbc/freebase/twitter/graph500]\n");
+        printf("Usage: program [db_name] [ldbc/freebase/mico/yeast]\n");
         return -1;
     }
     initLog();
@@ -84,19 +84,19 @@ int main(int argc, char* argv[]) {
     vector<long long> sources;
     if (!strcmp(argv[2], "ldbc")) {
         LOG_DEBUG_WRITE("console", "use ldbc dataset lid...")
-        vector<long long> tmp = {146099,119049,51670,152169,153302,107604,112505,51921,171483,156751}; //ldbc json2
+        vector<long long> tmp = {168062,126101,2900,164352,95984,115510,18809,103863,97894,32702}; //ldbc json2
         sources = tmp;
     } else if (!strcmp(argv[2], "freebase")) {
         LOG_DEBUG_WRITE("console", "use freebase dataset lid...")
-        vector<long long> tmp = {1465101,1202829,842389,882134,115187,1434038,1709605,1671993,1473105,372467}; //freebase json2
+        vector<long long> tmp = {1484158,63957,624478,1005153,1845599,1160813,1554886,1385143,147440,650644}; //freebase json2
         sources = tmp;
-    } else if (!strcmp(argv[2], "twitter")) {
+    } else if (!strcmp(argv[2], "mico")) {
         LOG_DEBUG_WRITE("console", "use twitter dataset lid...")
-        vector<long long> tmp = {6560807,1803319,34194,4624064,3909079,7893588,3110229,2217947,989555,5465226};
+        vector<long long> tmp = {10693,59896,10464,33317,95783,79938,92858,86993,14637,94686};
         sources = tmp;
-    } else if (!strcmp(argv[2], "graph500")) {
+    } else if (!strcmp(argv[2], "yeast")) {
         LOG_DEBUG_WRITE("console", "use graph500 dataset lid...")
-        vector<long long> tmp = {966892,68103,505800,194272,218438,66102,460371,696911,346984,1189161};
+        vector<long long> tmp = {517,831,541,313,1941,2263,1079,1883,349,1850};
         sources = tmp;
     } else if (!strcmp(argv[2], "sample")) {
         LOG_DEBUG_WRITE("console", "use sample dataset lid...(only 1)")
