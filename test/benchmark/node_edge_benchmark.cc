@@ -355,9 +355,9 @@ int main(int argc, char* argv[]) {
                 usage();
             }
             // load data
-            loadLdbcDataSet(argv[1]);
+            loadLdbcDataSet(argv[2]);
             // create new database
-            Graph db(argv[2], Graph::Create);
+            Graph db(argv[3], Graph::Create);
             Transaction tx(db, Transaction::ReadWrite);
             ID = StringID(ID_STR);
             db.create_index(Graph::NodeIndex, 0, ID_STR, PropertyType::Integer);
