@@ -34,7 +34,7 @@ static std::string gen_random(const int len) {
 // 100w random test each time
 // 10 times
 // int times = 1;
-const uint64_t dataSize = 20;
+const uint64_t dataSize = 2000;
 const uint64_t keySize = 10;
 const uint64_t valSize = 20;
 
@@ -66,7 +66,7 @@ void nodePropertyBenchmark(Graph &db) {
         auto start_t = system_clock::now();
         // Transaction tx(db, Transaction::ReadWrite);
         for (auto &kv : datas) {
-            n->set_property(kv.first.c_str(), kv.second.c_str());
+            node->set_property(kv.first.c_str(), kv.second.c_str());
         }
         tx.commit();
         auto end_t = system_clock::now();
