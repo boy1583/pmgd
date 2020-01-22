@@ -133,10 +133,10 @@ void insertNodeBenchmark(Graph &db) {
         Transaction tx(db, Transaction::ReadWrite);
         Node &node = db.add_node(StringID(n.xlabel.c_str()));
         node.set_property(ID_STR, n._id);
-        // @todo 省略了插入属性
-        /*for (auto &p : n.ps) {
+        // 可以省略了插入属性
+        for (auto &p : n.ps) {
             node.set_property(StringID(p.first.c_str()), p.second);
-        }*/
+        }
         tx.commit();
     }
 
@@ -218,8 +218,8 @@ void insertEdgeBenchmark(Graph &db) {
         Edge &edge = db.add_edge(src, dst, "labelE");
 
         edge.set_property(ID_STR, e._id);
-        // @todo not include property
-        // edge.set_property(StringID("_label"), e._label);
+        // maybe not include property
+        edge.set_property(StringID("_label"), e._label);
 
         tx.commit();
     }
@@ -311,10 +311,118 @@ void count(Graph &db) {
     }
 }
 
+void nodePropertySearch(Graph &db, vector<long long> &ids) {
+    // 先插入10个属性
+    const char* PROPERTY_NAME = "test_specific_property";
+    vector<string> vals(ids.size());
+    for (int i = 0;i < ids.size(); i++) {
+        vals[i] = "test_value_" + std::to_string(i);
+        {
+            Transaction tx(db, Transaction::ReadWrite);
+            Node &node = get_node(db, ids[i], nullptr);
+            node.set_property(PROPERTY_NAME, vals[i].c_str());
+            tx.commit();
+            LOG_DEBUG_WRITE("console", "insert {}:{} to node id:{}", PROPERTY_NAME, vals[i], ids[i])
+        }
+    }
+
+    // 仿照test suite中
+    {
+        Transaction tx(db, Transaction::ReadOnly);
+        for (int i = 0;i < ids.size(); i++) {
+            long long count = 0;
+            auto start_t = system_clock::now();
+            NodeIterator nodes = db.get_nodes(0,
+                                              PropertyPredicate(PROPERTY_NAME, PropertyPredicate::Eq, vals[i]));
+            while(nodes) {
+                count++;
+                nodes.next();
+            }
+            auto end_n = system_clock::now();
+            auto duration_n = duration_cast<microseconds>(end_n - start_t);
+            LOG_DEBUG_WRITE("console", "iterator_{} {}:{} count:{} duration is {} microseconds ≈ {} s",
+                    i, PROPERTY_NAME, vals[i], count, double(duration_n.count()),
+                            double(duration_n.count()) * microseconds::period::num / microseconds::period::den)
+        }
+        for (int i = ids.size();i >= 0;i--) {
+            long long count = 0;
+            auto start_t = system_clock::now();
+            NodeIterator nodes = db.get_nodes(0,
+                                              PropertyPredicate(PROPERTY_NAME, PropertyPredicate::Eq, vals[i]));
+            while(nodes) {
+                count++;
+                nodes.next();
+            }
+            auto end_n = system_clock::now();
+            auto duration_n = duration_cast<microseconds>(end_n - start_t);
+            LOG_DEBUG_WRITE("console", "iterator_10_{} {}:{} count:{} duration is {} microseconds ≈ {} s",
+                            i, PROPERTY_NAME, vals[i], count, double(duration_n.count()),
+                            double(duration_n.count()) * microseconds::period::num / microseconds::period::den)
+        }
+    }
+}
+
+void edgePropertySearch(Graph &db, vector<long long> &ids) {
+    // 先添加10条边
+    const char* LABEL = "test_label";
+    const char* PROPERTY_NAME = "test_specific_property";
+    vector<string> vals(ids.size());
+    for (int i = 0;i < ids.size(); i++) {
+        vals[i] = "test_value_" + std::to_string(i);
+        {
+            Transaction tx(db, Transaction::ReadWrite);
+            Node &n = get_node(db, ids[i], nullptr);
+            Node &m = get_node(db, ids[(i + 1) % ids.size()], nullptr);
+            Edge &edge = db.add_edge(n, m, LABEL);
+            edge.set_property(PROPERTY_NAME, vals[i].c_str());
+            tx.commit();
+            LOG_DEBUG_WRITE("console", "insert {}:{} to edge {}->{}",
+                    PROPERTY_NAME, vals[i], ids[i], ids[(i + 1) % ids.size()])
+        }
+    }
+
+    // 仿照test suite中
+    {
+        Transaction tx(db, Transaction::ReadOnly);
+        for (int i = 0;i < ids.size(); i++) {
+            long long count = 0;
+            auto start_t = system_clock::now();
+            EdgeIterator edges = db.get_edges(0,
+                                              PropertyPredicate(PROPERTY_NAME, PropertyPredicate::Eq, vals[i]));
+            while(edges) {
+                count++;
+                edges.next();
+            }
+            auto end_n = system_clock::now();
+            auto duration_n = duration_cast<microseconds>(end_n - start_t);
+            LOG_DEBUG_WRITE("console", "iterator_{} {}:{} count:{} duration is {} microseconds ≈ {} s",
+                            i, PROPERTY_NAME, vals[i], count, double(duration_n.count()),
+                            double(duration_n.count()) * microseconds::period::num / microseconds::period::den)
+        }
+        for (int i = ids.size();i >= 0;i--) {
+            long long count = 0;
+            auto start_t = system_clock::now();
+            EdgeIterator edges = db.get_edges(0,
+                                              PropertyPredicate(PROPERTY_NAME, PropertyPredicate::Eq, vals[i]));
+            while(edges) {
+                count++;
+                edges.next();
+            }
+            auto end_n = system_clock::now();
+            auto duration_n = duration_cast<microseconds>(end_n - start_t);
+            LOG_DEBUG_WRITE("console", "iterator_10_{} {}:{} count:{} duration is {} microseconds ≈ {} s",
+                            i, PROPERTY_NAME, vals[i], count, double(duration_n.count()),
+                            double(duration_n.count()) * microseconds::period::num / microseconds::period::den)
+        }
+    }
+}
+
 void usage() {
     printf("Usage:\n");
     printf("\tprogram create [dataset_path] [Graph_Name] [count...getnode...getedge...updatenode...updateedge...deleteedge...deletenode]\n");
     printf("\tprogram load [Graph_Name] [count]\n");
+    printf("\tprogram nsearch [Graph_Name] (only for ldbc)\n");
+    printf("\tprogram esearch [Graph_Name] (only for ldbc)\n");
     exit(0);
 }
 
@@ -376,6 +484,16 @@ int main(int argc, char* argv[]) {
 
             count(db);
 
+        } else if (!strcmp(argv[1], "nsearch")) {
+            Graph db(argv[2], Graph::ReadWrite);
+            // ldbc
+            vector<long long> ids = {871871,562439,1022837,842648,399882,519531,1148153,449638,411950,1257602};
+            nodePropertySearch(db, ids);
+        } else if (!strcmp(argv[1], "esearch")) {
+            Graph db(argv[2], Graph::ReadWrite);
+            // ldbc
+            vector<long long> ids = {871871,562439,1022837,842648,399882,519531,1148153,449638,411950,1257602};
+            edgePropertySearch(db, ids);
         } else {
             usage();
         }

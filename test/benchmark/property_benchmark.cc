@@ -87,6 +87,8 @@ void nodePropertyBenchmark(Graph &db) {
         auto start_t = system_clock::now();
         {
             Transaction tx(db, Transaction::ReadOnly);
+            Node &node = db.add_node(0);
+            n = &node;
             for (auto &kv : datas) {
                 n->get_property(kv.first.c_str()).string_value();
             }
@@ -175,7 +177,7 @@ void edgePropertyBenchmark(Graph &db) {
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t); // μs 微妙
         LOG_DEBUG_WRITE("console",
-                        "node property zone insert test => key size: {} bytes, value size: {} bytes, number of record: {}",
+                        "edge property zone insert test => key size: {} bytes, value size: {} bytes, number of record: {}",
                         keySize, valSize, dataSize)
         LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
                         double(duration.count()),
@@ -196,7 +198,7 @@ void edgePropertyBenchmark(Graph &db) {
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t);
         LOG_DEBUG_WRITE("console",
-                        "node property zone get test => key size: {} bytes, value size: {} bytes, number of record: {}",
+                        "edge property zone get test => key size: {} bytes, value size: {} bytes, number of record: {}",
                         keySize, valSize, dataSize)
         LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
                         double(duration.count()),
@@ -223,7 +225,7 @@ void edgePropertyBenchmark(Graph &db) {
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t); // μs 微妙
         LOG_DEBUG_WRITE("console",
-                        "node property zone update test => key size: {} bytes, value size: {} bytes, number of record: {}",
+                        "edge property zone update test => key size: {} bytes, value size: {} bytes, number of record: {}",
                         keySize, valSize, dataSize)
         LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
                         double(duration.count()),
@@ -244,7 +246,7 @@ void edgePropertyBenchmark(Graph &db) {
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t); // μs 微妙
         LOG_DEBUG_WRITE("console",
-                        "node property zone update test => key size: {} bytes, value size: {} bytes, number of record: {}",
+                        "edge property zone update test => key size: {} bytes, value size: {} bytes, number of record: {}",
                         keySize, valSize, dataSize)
         LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
                         double(duration.count()),
