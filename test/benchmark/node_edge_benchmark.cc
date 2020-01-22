@@ -133,15 +133,16 @@ void insertNodeBenchmark(Graph &db) {
         Transaction tx(db, Transaction::ReadWrite);
         Node &node = db.add_node(StringID(n.xlabel.c_str()));
         node.set_property(ID_STR, n._id);
-        for (auto &p : n.ps) {
+        // @todo 省略了插入属性
+        /*for (auto &p : n.ps) {
             node.set_property(StringID(p.first.c_str()), p.second);
-        }
+        }*/
         tx.commit();
     }
 
     auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
-    LOG_DEBUG_WRITE("console", "node insert test (include property) => number of record: {}", nodes.size())
+    LOG_DEBUG_WRITE("console", "node insert test (not include property) => number of record: {}", nodes.size())
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
                     double(duration.count()),
                     double(duration.count()) * microseconds::period::num / microseconds::period::den,
@@ -197,7 +198,7 @@ void deleteNodeBenchmark(Graph &db) {
     }
     auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
-    LOG_DEBUG_WRITE("console", "node delete test (include property) => number of record: {}", nodes.size())
+    LOG_DEBUG_WRITE("console", "node delete test => number of record: {}", nodes.size())
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
                     double(duration.count()),
                     double(duration.count()) * microseconds::period::num / microseconds::period::den,
@@ -217,13 +218,14 @@ void insertEdgeBenchmark(Graph &db) {
         Edge &edge = db.add_edge(src, dst, "labelE");
 
         edge.set_property(ID_STR, e._id);
-        edge.set_property(StringID("_label"), e._label);
+        // @todo not include property
+        // edge.set_property(StringID("_label"), e._label);
 
         tx.commit();
     }
     auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
-    LOG_DEBUG_WRITE("console", "edge insert test (include property) => number of record: {}", edges.size())
+    LOG_DEBUG_WRITE("console", "edge insert test (not include property) => number of record: {}", edges.size())
     LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
                     double(duration.count()),
                     double(duration.count()) * microseconds::period::num / microseconds::period::den,

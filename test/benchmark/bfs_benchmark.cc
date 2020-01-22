@@ -42,9 +42,14 @@ void bfs(Graph &db, uint64_t tag, int maxDep) {
         que.pop();
 
         Node &n = *(db.get_nodes(0, PropertyPredicate(StringID(ID_STR), PropertyPredicate::Eq, (long long)id)));
-        for (EdgeIterator it = n.get_edges(Direction::Outgoing); it; it.next()) {
+        for (EdgeIterator it = n.get_edges(); it; it.next()) {
+            // get both direct edge
             Node &next = (*it).get_destination();
             long long next_id = next.get_property(StringID(ID_STR)).int_value();
+            if (next_id == id) {
+                Node &pre = (*it).get_source();
+                next_id = pre.get_property(StringID(ID_STR)).int_value();
+            }
             if (!visted.count(next_id)) {
                 // LOG_DEBUG_WRITE("console", "level:{} : {} -> {}", currentDep, id, next_id);
                 // std::cout << it->SecondNode << " ";
