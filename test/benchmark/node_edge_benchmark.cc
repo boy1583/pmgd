@@ -458,6 +458,7 @@ int main(int argc, char* argv[]) {
 
     // create database
     try {
+        ID = StringID(ID_STR);
         if (!strcmp(argv[1], "create")) {
             if (argc < 2) {
                 usage();
@@ -467,7 +468,6 @@ int main(int argc, char* argv[]) {
             // create new database
             Graph db(argv[3], Graph::Create);
             Transaction tx(db, Transaction::ReadWrite);
-            ID = StringID(ID_STR);
             db.create_index(Graph::NodeIndex, 0, ID_STR, PropertyType::Integer);
             db.create_index(Graph::EdgeIndex, 0, ID_STR, PropertyType::Integer);
             tx.commit();
