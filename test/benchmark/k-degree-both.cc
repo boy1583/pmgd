@@ -18,8 +18,10 @@ using namespace chrono;
 static const char ID_STR[] = "pmgd.loader.id";
 static StringID ID;
 
+bool debug = false;
+
 void usage() {
-    printf("Usage: program [db_name]\n");
+    printf("Usage: program [db_name] [-d]\n");
     exit(0);
 }
 
@@ -28,6 +30,10 @@ void usage() {
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         usage();
+    }
+
+    if (argc >= 3 && !strcmp(argv[2], "-d")) {
+        debug = true;
     }
 
     // init log
@@ -56,7 +62,8 @@ int main(int argc, char* argv[]) {
             }
             if (count >= K) {
                 total++;
-                LOG_DEBUG_WRITE("console", "source id: {}, count: {}", node.get_property(StringID(ID_STR)).int_value(), count);
+                if (debug)
+                    LOG_DEBUG_WRITE("console", "source id: {}, count: {}", node.get_property(StringID(ID_STR)).int_value(), count);
             }
             nodes.next();
         }
