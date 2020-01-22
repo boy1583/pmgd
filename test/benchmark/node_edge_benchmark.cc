@@ -313,7 +313,7 @@ void count(Graph &db) {
 
 void nodePropertySearch(Graph &db, vector<long long> &ids) {
     // 先插入10个属性
-    const char* PROPERTY_NAME = "specific_";
+    const char* PROPERTY_NAME = "specific";
     vector<string> vals(ids.size());
     for (int i = 0;i < ids.size(); i++) {
         vals[i] = "test_value_" + std::to_string(i);
@@ -344,7 +344,7 @@ void nodePropertySearch(Graph &db, vector<long long> &ids) {
                     i, PROPERTY_NAME, vals[i], count, double(duration_n.count()),
                             double(duration_n.count()) * microseconds::period::num / microseconds::period::den)
         }
-        for (int i = ids.size();i >= 0;i--) {
+        for (int i = ids.size() - 1;i >= 0;i--) {
             long long count = 0;
             auto start_t = system_clock::now();
             NodeIterator nodes = db.get_nodes(0,
@@ -399,7 +399,7 @@ void edgePropertySearch(Graph &db, vector<long long> &ids) {
                             i, PROPERTY_NAME, vals[i], count, double(duration_n.count()),
                             double(duration_n.count()) * microseconds::period::num / microseconds::period::den)
         }
-        for (int i = ids.size();i >= 0;i--) {
+        for (int i = ids.size() - 1;i >= 0;i--) {
             long long count = 0;
             auto start_t = system_clock::now();
             EdgeIterator edges = db.get_edges(0,
