@@ -61,6 +61,7 @@ void nodePropertyBenchmark(Graph &db) {
         Transaction tx(db, Transaction::ReadWrite);
         Node &node = db.add_node(0);
         n = &node;
+        tx.commit();
     }
 
     // insert
@@ -138,6 +139,7 @@ void nodePropertyBenchmark(Graph &db) {
             for (auto &kv : datas) {
                 n->remove_property(kv.first.c_str());
             }
+            tx.commit();
         }
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t); // μs 微妙
@@ -161,6 +163,7 @@ void edgePropertyBenchmark(Graph &db) {
         Node &m = db.add_node(2);
         Edge &edge = db.add_edge(n, m, 0);
         e = &edge;
+        tx.commit();
     }
 
     // insert
@@ -238,6 +241,7 @@ void edgePropertyBenchmark(Graph &db) {
             for (auto &kv : datas) {
                 e->remove_property(kv.first.c_str());
             }
+            tx.commit();
         }
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t); // μs 微妙
