@@ -66,7 +66,7 @@ void nodePropertyBenchmark(Graph &db) {
         auto start_t = system_clock::now();
         // Transaction tx(db, Transaction::ReadWrite);
         for (auto &kv : datas) {
-            node->set_property(kv.first.c_str(), kv.second.c_str());
+            node.set_property(kv.first.c_str(), kv.second.c_str());
         }
         tx.commit();
         auto end_t = system_clock::now();
