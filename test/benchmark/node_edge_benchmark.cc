@@ -80,24 +80,24 @@ void loadLdbcDataSet(const char* ldbcPath) {
     // std::cout << d["mode"].GetString();
     for (auto &v : d["vertices"].GetArray()) {
         LDBCNode node;
-        node._id = v["_id"].GetInt64() + 1ULL;
+        node._id = v["_id"].GetInt64();
         maxV = max(maxV, node._id);
-        node.xlabel = v["xlabel"].GetString();
+        node.xlabel = v["xlabel"]["value"].GetString();
         auto &empty = node.ps;
 
-        if (v.HasMember("iid")) empty.emplace_back(make_pair("iid", v["iid"].GetString()));
-        if (v.HasMember("birthday")) empty.emplace_back(make_pair("birthday", v["birthday"].GetString()));
-        if (v.HasMember("lastName")) empty.emplace_back(make_pair("lastName", v["lastName"].GetString()));
-        if (v.HasMember("gender")) empty.emplace_back(make_pair("gender", v["gender"].GetString()));
-        if (v.HasMember("length")) empty.emplace_back(make_pair("length", v["length"].GetString()));
-        if (v.HasMember("language")) empty.emplace_back(make_pair("language", v["language"].GetString()));
-        if (v.HasMember("creationDate")) empty.emplace_back(make_pair("creationDate", v["creationDate"].GetString()));
-        if (v.HasMember("xname")) empty.emplace_back(make_pair("xname", v["xname"].GetString()));
-        if (v.HasMember("url")) empty.emplace_back(make_pair("url", v["url"].GetString()));
-        if (v.HasMember("firstName")) empty.emplace_back(make_pair("firstName", v["firstName"].GetString()));
-        if (v.HasMember("imageFile")) empty.emplace_back(make_pair("imageFile", v["imageFile"].GetString()));
-        if (v.HasMember("locationIP")) empty.emplace_back(make_pair("locationIP", v["locationIP"].GetString()));
-        if (v.HasMember("email")) empty.emplace_back(make_pair("email", v["email"].GetString()));
+        if (v.HasMember("iid")) empty.emplace_back(make_pair("iid", v["iid"]["value"].GetString()));
+        if (v.HasMember("birthday")) empty.emplace_back(make_pair("birthday", v["birthday"]["value"].GetString()));
+        if (v.HasMember("lastName")) empty.emplace_back(make_pair("lastName", v["lastName"]["value"].GetString()));
+        if (v.HasMember("gender")) empty.emplace_back(make_pair("gender", v["gender"]["value"].GetString()));
+        if (v.HasMember("length")) empty.emplace_back(make_pair("length", v["length"]["value"].GetString()));
+        if (v.HasMember("language")) empty.emplace_back(make_pair("language", v["language"]["value"].GetString()));
+        if (v.HasMember("creationDate")) empty.emplace_back(make_pair("creationDate", v["creationDate"]["value"].GetString()));
+        if (v.HasMember("xname")) empty.emplace_back(make_pair("xname", v["xname"]["value"].GetString()));
+        if (v.HasMember("url")) empty.emplace_back(make_pair("url", v["url"]["value"].GetString()));
+        if (v.HasMember("firstName")) empty.emplace_back(make_pair("firstName", v["firstName"]["value"].GetString()));
+        if (v.HasMember("imageFile")) empty.emplace_back(make_pair("imageFile", v["imageFile"]["value"].GetString()));
+        if (v.HasMember("locationIP")) empty.emplace_back(make_pair("locationIP", v["locationIP"]["value"].GetString()));
+        if (v.HasMember("email")) empty.emplace_back(make_pair("email", v["email"]["value"].GetString()));
 
         nodes.emplace_back(node);
 
@@ -114,8 +114,8 @@ void loadLdbcDataSet(const char* ldbcPath) {
         edge._id = e["_id"].GetInt64();
         assert(edge._id != 0);
         maxE = max(maxE, edge._id);
-        edge._inV = e["_inV"].GetInt64() + 1ULL;
-        edge._outV = e["_outV"].GetInt64() + 1ULL;
+        edge._inV = e["_inV"].GetInt64();
+        edge._outV = e["_outV"].GetInt64();
         edge._label = e["_label"].GetString();
 
         // _outV _id _inV _label
