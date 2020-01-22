@@ -112,7 +112,7 @@ void loadLdbcDataSet(const char* ldbcPath) {
     for (auto &e : d["edges"].GetArray()) {
         LDBCEdge edge;
         edge._id = e["_id"].GetInt64();
-        assert(edge._id != 0);
+        // assert(edge._id != 0);
         maxE = max(maxE, edge._id);
         edge._inV = e["_inV"].GetInt64();
         edge._outV = e["_outV"].GetInt64();
