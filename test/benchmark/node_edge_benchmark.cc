@@ -313,7 +313,7 @@ void count(Graph &db) {
 
 void nodePropertySearch(Graph &db, vector<long long> &ids) {
     // 先插入10个属性
-    const char* PROPERTY_NAME = "test_specific_property";
+    const char* PROPERTY_NAME = "specific_";
     vector<string> vals(ids.size());
     for (int i = 0;i < ids.size(); i++) {
         vals[i] = "test_value_" + std::to_string(i);
@@ -365,7 +365,7 @@ void nodePropertySearch(Graph &db, vector<long long> &ids) {
 void edgePropertySearch(Graph &db, vector<long long> &ids) {
     // 先添加10条边
     const char* LABEL = "test_label";
-    const char* PROPERTY_NAME = "test_specific_property";
+    const char* PROPERTY_NAME = "specific_";
     vector<string> vals(ids.size());
     for (int i = 0;i < ids.size(); i++) {
         vals[i] = "test_value_" + std::to_string(i);
@@ -481,25 +481,15 @@ int main(int argc, char* argv[]) {
         } else if (!strcmp(argv[1], "load")) {
             // load ReadWrite
             Graph db(argv[2], Graph::ReadWrite);
-            Transaction tx(db, Transaction::ReadWrite);
-            ID = StringID(ID_STR);
-            tx.commit();
-
             count(db);
 
         } else if (!strcmp(argv[1], "nsearch")) {
             Graph db(argv[2], Graph::ReadWrite);
-            Transaction tx(db, Transaction::ReadWrite);
-            ID = StringID(ID_STR);
-            tx.commit();
             // ldbc
             vector<long long> ids = {168062,126101,2900,164352,95984,115510,18809,103863,97894,32702};
             nodePropertySearch(db, ids);
         } else if (!strcmp(argv[1], "esearch")) {
             Graph db(argv[2], Graph::ReadWrite);
-            Transaction tx(db, Transaction::ReadWrite);
-            ID = StringID(ID_STR);
-            tx.commit();
             // ldbc
             vector<long long> ids = {168062,126101,2900,164352,95984,115510,18809,103863,97894,32702};
             edgePropertySearch(db, ids);
