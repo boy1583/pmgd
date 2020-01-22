@@ -487,12 +487,12 @@ int main(int argc, char* argv[]) {
         } else if (!strcmp(argv[1], "nsearch")) {
             Graph db(argv[2], Graph::ReadWrite);
             // ldbc
-            vector<long long> ids = {871871,562439,1022837,842648,399882,519531,1148153,449638,411950,1257602};
+            vector<long long> ids = {168062,126101,2900,164352,95984,115510,18809,103863,97894,32702};
             nodePropertySearch(db, ids);
         } else if (!strcmp(argv[1], "esearch")) {
             Graph db(argv[2], Graph::ReadWrite);
             // ldbc
-            vector<long long> ids = {871871,562439,1022837,842648,399882,519531,1148153,449638,411950,1257602};
+            vector<long long> ids = {168062,126101,2900,164352,95984,115510,18809,103863,97894,32702};
             edgePropertySearch(db, ids);
         } else {
             usage();
