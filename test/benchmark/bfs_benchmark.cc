@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
         sources = tmp;
     } else if (!strcmp(argv[2], "freebase")) {
         LOG_DEBUG_WRITE("console", "use freebase dataset lid...")
-        vector<long long> tmp = {1484158,63957,624478,1005153,1845599,1160813,1554886,1385143,147440,650644}; //freebase json2
+        vector<long long> tmp = {63957, 147440, 624478, 650644, 1005153, 1160813, 1385143, 1484158, 1554886, 1845599}; //freebase json2
         sources = tmp;
     } else if (!strcmp(argv[2], "mico")) {
         LOG_DEBUG_WRITE("console", "use twitter dataset lid...")
