@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
     vector<long long> sources;
     if (!strcmp(argv[2], "ldbc")) {
         LOG_DEBUG_WRITE("console", "use ldbc dataset lid...")
-        vector<long long> tmp = {168062,126101,2900,164352,95984,115510,18809,103863,97894,32702}; //ldbc json2
+        vector<long long> tmp = {2900, 18809, 32702, 95984, 97894, 103863, 115510, 126101, 164352, 168062}; //ldbc json2
         sources = tmp;
     } else if (!strcmp(argv[2], "freebase")) {
         LOG_DEBUG_WRITE("console", "use freebase dataset lid...")
