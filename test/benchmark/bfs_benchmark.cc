@@ -94,8 +94,7 @@ int main(int argc, char* argv[]) {
         sources = tmp;
     } else if (!strcmp(argv[2], "graph500")) {
         LOG_DEBUG_WRITE("console", "use graph500 dataset lid...")
-        assert(false);
-        vector<long long> tmp = {10693,59896,10464,33317,95783,79938,92858,86993,14637,94686};
+        vector<long long> tmp = {966892,68103,505800,194272,218438,66102,460371,696911,346984,1189161};
         sources = tmp;
     } else if (!strcmp(argv[2], "mico")) {
         LOG_DEBUG_WRITE("console", "use mico dataset lid...")
