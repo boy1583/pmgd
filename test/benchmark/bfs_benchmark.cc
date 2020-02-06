@@ -95,17 +95,17 @@ int main(int argc, char* argv[]) {
     } else if (!strcmp(argv[2], "graph500")) {
         LOG_DEBUG_WRITE("console", "use graph500 dataset lid...")
         assert(false);
-        // vector<long long> tmp = {10693,59896,10464,33317,95783,79938,92858,86993,14637,94686};
+        vector<long long> tmp = {10693,59896,10464,33317,95783,79938,92858,86993,14637,94686};
         sources = tmp;
     } else if (!strcmp(argv[2], "mico")) {
         LOG_DEBUG_WRITE("console", "use mico dataset lid...")
         assert(false);
-        // vector<long long> tmp = {10693,59896,10464,33317,95783,79938,92858,86993,14637,94686};
+        vector<long long> tmp = {10693,59896,10464,33317,95783,79938,92858,86993,14637,94686};
         sources = tmp;
     } else if (!strcmp(argv[2], "yeast")) {
         LOG_DEBUG_WRITE("console", "use yeast dataset lid...")
         assert(false);
-        // vector<long long> tmp = {517,831,541,313,1941,2263,1079,1883,349,1850};
+        vector<long long> tmp = {517,831,541,313,1941,2263,1079,1883,349,1850};
         sources = tmp;
     } else if (!strcmp(argv[2], "sample")) {
         LOG_DEBUG_WRITE("console", "use sample dataset lid...(only 1)")
