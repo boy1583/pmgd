@@ -73,7 +73,7 @@ void bfs(Graph &db, uint64_t tag, int maxDep) {
 int main(int argc, char* argv[]) {
     // load json data into DB
     if (argc < 3) {
-        printf("Usage: program [db_name] [ldbc/freebase/mico/yeast]\n");
+        printf("Usage: program [db_name] [ldbc/freebase/mico/yeast/twitter]\n");
         return -1;
     }
     initLog();
@@ -88,13 +88,24 @@ int main(int argc, char* argv[]) {
         LOG_DEBUG_WRITE("console", "use freebase dataset lid...")
         vector<long long> tmp = {63957, 147440, 624478, 650644, 1005153, 1160813, 1385143, 1484158, 1554886, 1845599}; //freebase json2
         sources = tmp;
-    } else if (!strcmp(argv[2], "mico")) {
+    } else if (!strcmp(argv[2], "twitter")) {
         LOG_DEBUG_WRITE("console", "use twitter dataset lid...")
-        vector<long long> tmp = {10693,59896,10464,33317,95783,79938,92858,86993,14637,94686};
+        vector<long long> tmp = {239261,7713390,6838192,5378052,3581806,4422251,3303191,7771631,5901685,8395972}; // twitter json2
+        sources = tmp;
+    } else if (!strcmp(argv[2], "graph500")) {
+        LOG_DEBUG_WRITE("console", "use graph500 dataset lid...")
+        assert(false);
+        // vector<long long> tmp = {10693,59896,10464,33317,95783,79938,92858,86993,14637,94686};
+        sources = tmp;
+    } else if (!strcmp(argv[2], "mico")) {
+        LOG_DEBUG_WRITE("console", "use mico dataset lid...")
+        assert(false);
+        // vector<long long> tmp = {10693,59896,10464,33317,95783,79938,92858,86993,14637,94686};
         sources = tmp;
     } else if (!strcmp(argv[2], "yeast")) {
-        LOG_DEBUG_WRITE("console", "use graph500 dataset lid...")
-        vector<long long> tmp = {517,831,541,313,1941,2263,1079,1883,349,1850};
+        LOG_DEBUG_WRITE("console", "use yeast dataset lid...")
+        assert(false);
+        // vector<long long> tmp = {517,831,541,313,1941,2263,1079,1883,349,1850};
         sources = tmp;
     } else if (!strcmp(argv[2], "sample")) {
         LOG_DEBUG_WRITE("console", "use sample dataset lid...(only 1)")
