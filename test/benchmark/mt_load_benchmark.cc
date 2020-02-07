@@ -136,6 +136,8 @@ public:
          // multiple thread
          vector<thread> threads;
 
+        auto start_t = system_clock::now();
+
          for (int i = 0;i < nthread; i++) {
              threads.push_back(thread(&MTLoadBenchmark::insertEdgeThread, this, nthread, i));
          }
@@ -143,7 +145,12 @@ public:
          for (auto &t : threads) {
              t.join();
          }
-         LOG_DEBUG_WRITE("console", "all thread joined.")
+
+        auto end_t = system_clock::now();
+        auto duration = duration_cast<microseconds>(end_t - start_t);
+        LOG_DEBUG_WRITE("console", "all thread joined. duration is {} microseconds ≈ {} s",
+                        double(duration.count()),
+                        double(duration.count()) * microseconds::period::num / microseconds::period::den);
 
          threads.clear();
      }
@@ -161,22 +168,25 @@ private:
 };
 
 int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        printf("Usage: program [dataset path]");
+    if (argc < 3) {
+        printf("Usage: program [dataset path] [thread num]");
         return 0;
     }
 
     const char* path = argv[1];
+    int nthread = atoi(argv[2]);
 
     initLog();
 
     if (system("rm -rf ./graph_mt_load") < 0)
         exit(-1);
 
+    LOG_DEBUG_WRITE("console", "dataset path: {}, number of thread: {}", path, nthread)
+
     try {
         MTLoadBenchmark mt;
         mt.loadLDBCDataset(path);
-        mt.test1(4);
+        mt.test1(nthread);
         // 2 => 86s
     } catch (Exception &e) {
         print_exception(e);
