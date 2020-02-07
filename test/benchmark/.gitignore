@@ -4,5 +4,6 @@ NN-both-filtered
 node_edge_benchmark
 property_benchmark
 shortest-path
+mt_load_benchmark
 ./*.d
 ./*.o

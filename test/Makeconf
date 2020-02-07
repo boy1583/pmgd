@@ -25,6 +25,7 @@ TEST_SRCS := $(addprefix test/, \
                          benchmark/NN-both-filtered.cc \
                          benchmark/k-degree-both.cc \
                          benchmark/shortest-path.cc \
+                         benchmark/mt_load_benchmark.cc \
                          )
 
 # Derive a list of objects.
@@ -85,6 +86,11 @@ test/stripelocktest: test/stripelocktest.o $(TEST_LIBS)
 
 # Special case for stripelocktest.
 test/mtaddfindremovetest: test/mtaddfindremovetest.o $(TEST_LIBS)
+	$(call print,LINK,$@)
+	$(CC) $(OPT) -o $@ $< $(TEST_LIBS) -lpthread
+
+# Special case for mt load benchmark.
+test/benchmark/mt_load_benchmark: test/benchmark/mt_load_benchmark.o $(TEST_LIBS)
 	$(call print,LINK,$@)
 	$(CC) $(OPT) -o $@ $< $(TEST_LIBS) -lpthread
 

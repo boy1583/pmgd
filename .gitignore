@@ -9,3 +9,9 @@ test/*.class
 test/*test
 
 bin
+
+CMakeLists.txt
+
+tools/CMakeLists.txt
+
+test/CMakeLists.txt

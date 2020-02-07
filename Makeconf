@@ -94,10 +94,10 @@ PHONY += all
 all: doall
 
 # Include subordinate Makefiles.
-include $(ROOTDIR)/src/Makeconf
-include $(ROOTDIR)/util/Makeconf
+# include $(ROOTDIR)/src/Makeconf
+# include $(ROOTDIR)/util/Makeconf
 # include $(ROOTDIR)/java/Makeconf
-include $(ROOTDIR)/tools/Makeconf
+# include $(ROOTDIR)/tools/Makeconf
 include $(ROOTDIR)/test/Makeconf
 
 # The default rule builds all libraries and the utility binaries.
