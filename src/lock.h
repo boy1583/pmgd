@@ -50,7 +50,8 @@ namespace PMGD {
         // *** Tune experimentally
         static const size_t MIN_BACKOFF_DELAY = 100000;
         static const size_t MAX_BACKOFF_DELAY = 10000000;
-        static const unsigned MAX_ATTEMPTS      = 10;
+        // update backoff attempts
+        static const unsigned MAX_ATTEMPTS      = 100;
 
         uint16_t xadd(volatile uint16_t &m, uint16_t v)
             { return ::xadd<uint16_t>(m, v); }
