@@ -248,8 +248,8 @@ void MTLoadBenchmark::insertEdgeThread(int nthread, int tindex) {
     if (end > edges.size())
         end = edges.size();
     try {
+        Transaction tx(_db, Transaction::ReadWrite);
         for (long long i = begin; i < end; i++) {
-            Transaction tx(_db, Transaction::ReadWrite);
             // insert edge
             auto &e = edges[i];
             Edge &edge = _db.add_edge(*nodeRefs[e._outV], *nodeRefs[e._inV], e._label.c_str());
@@ -257,8 +257,8 @@ void MTLoadBenchmark::insertEdgeThread(int nthread, int tindex) {
             for (auto &p : e._ps) {
                 edge.set_property(p.first.c_str(), p.second.c_str());
             }
-            tx.commit();
         }
+        tx.commit();
     } catch (Exception &e) {
         print_exception(e);
     }
