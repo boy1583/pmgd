@@ -117,16 +117,16 @@ public:
 
          // insert node
         try {
+            Transaction tx(_db, Transaction::ReadWrite);
             for (auto &node : nodes) {
-                Transaction tx(_db, Transaction::ReadWrite);
                 Node &n = _db.add_node(node._label.c_str());
                 n.set_property("_id", node._id);
                 for (auto &p : node.ps) {
                     n.set_property(p.first.c_str(), p.second.c_str());
                 }
                 nodeRefs[node._id] = &n;
-                tx.commit();
             }
+            tx.commit();
 
         } catch (Exception &e) {
              print_exception(e);
@@ -259,7 +259,6 @@ void MTLoadBenchmark::insertEdgeThread(int nthread, int tindex) {
             }
             tx.commit();
         }
-
     } catch (Exception &e) {
         print_exception(e);
     }

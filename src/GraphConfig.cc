@@ -41,9 +41,12 @@ using namespace PMGD;
 static const size_t DEFAULT_NODE_SIZE = 64;
 static const size_t DEFAULT_EDGE_SIZE = 32;
 
-static const size_t DEFAULT_TRANSACTION_TABLE_SIZE = SIZE_4KB;
-//static const size_t DEFAULT_JOURNAL_SIZE = 64 * SIZE_2MB;
-static const size_t DEFAULT_JOURNAL_SIZE = 256 * SIZE_2MB;
+// static const size_t DEFAULT_TRANSACTION_TABLE_SIZE = SIZE_4KB; // 原来的值
+// static const size_t DEFAULT_JOURNAL_SIZE = 64 * SIZE_2MB; // 原来的值
+
+// each transaction is 64Byte，
+static const size_t DEFAULT_TRANSACTION_TABLE_SIZE = (SIZE_4KB / 2); // max transaction 32
+static const size_t DEFAULT_JOURNAL_SIZE = SIZE_1GB * 4 * 32; // 4GB each transaction
 
 static const size_t INDEX_MANAGER_SIZE = SIZE_4KB;
 
