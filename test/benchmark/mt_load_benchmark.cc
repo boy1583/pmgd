@@ -60,10 +60,10 @@ private:
     /**
      * data
      */
-    vector<LNode> nodes;
+    static vector<LNode> nodes;
     map<long long, Node*> nodeRefs;
 
-    vector<LEdge> edges;
+    static vector<LEdge> edges;
 
     // mutex
     std::mutex mtx;
@@ -87,7 +87,7 @@ public:
      * load ldbc dataset
      * @param path
      */
-    void loadLDBCDataset(const char* json2_path);
+    static void loadLDBCDataset(const char* json2_path);
 
     // void createLDBCIndex();
 
@@ -95,7 +95,7 @@ public:
      * load freebase dataset
      * @param path
      */
-    void loadFreebaseDataset(const char* path);
+    static void loadFreebaseDataset(const char* path);
 
     // void createFreebaseIndex();
 
@@ -111,7 +111,7 @@ public:
      * load twitter dataset
      * @param path
      */
-    void loadTwitterDataset(const char* path);
+    static void loadTwitterDataset(const char* path);
 
     // void createTwitterIndex();
 
@@ -156,7 +156,8 @@ public:
 
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t);
-        LOG_DEBUG_WRITE("console", "all thread joined. duration is {} microseconds ≈ {} s",
+        LOG_DEBUG_WRITE("console", "{} thread(s) joined. duration is {} microseconds ≈ {} s",
+                        nthread,
                         double(duration.count()),
                         double(duration.count()) * microseconds::period::num / microseconds::period::den);
 
@@ -196,12 +197,12 @@ int main(int argc, char* argv[]) {
         /**
      * ldbc
      */
+        MTLoadBenchmark::loadLDBCDataset(dataPath);
         try {
             for (auto n : as) {
                 if (system("rm -rf ./graph_mt_load") < 0)
                     exit(-1);
                 MTLoadBenchmark mt;
-                mt.loadLDBCDataset(dataPath);
                 if (n <= max_thread && n >= min_thread) {
                     mt.test1(n);
                 }
@@ -213,12 +214,12 @@ int main(int argc, char* argv[]) {
         /**
      * freebase
      */
+        MTLoadBenchmark::loadFreebaseDataset(dataPath);
         try {
             for (auto n : as) {
                 if (system("rm -rf ./graph_mt_load") < 0)
                     exit(-1);
                 MTLoadBenchmark mt;
-                mt.loadFreebaseDataset(dataPath);
                 if (n <= max_thread && n >= min_thread) {
                     mt.test1(n);
                 }
@@ -230,12 +231,12 @@ int main(int argc, char* argv[]) {
         /**
      * twitter
      */
+        MTLoadBenchmark::loadTwitterDataset(dataPath);
         try {
             for (auto n : as) {
                 if (system("rm -rf ./graph_mt_load") < 0)
                     exit(-1);
                 MTLoadBenchmark mt;
-                mt.loadTwitterDataset(dataPath);
                 if (n <= max_thread && n >= min_thread) {
                     mt.test1(n);
                 }
@@ -401,3 +402,5 @@ void MTLoadBenchmark::insertEdgeThread(int nthread, int tindex) {
 }
 
 
+std::vector<LNode> MTLoadBenchmark::nodes;
+std::vector<LEdge> MTLoadBenchmark::edges;
