@@ -164,7 +164,7 @@ private:
     Graph::Config& init_config(Graph::Config &config) {
         config.allocator_region_size = 104857600;  // 100MB
         printf("hardware_concurrency is %u\n", std::thread::hardware_concurrency());
-        config.num_allocators = std::thread::hardware_concurrency();
+        config.num_allocators = 64;
         return config;
     }
 };
