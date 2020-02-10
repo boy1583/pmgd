@@ -139,6 +139,8 @@ public:
          // multiple thread
          vector<thread> threads;
 
+        index = 0;
+
         auto start_t = system_clock::now();
 
          for (int i = 0;i < nthread; i++) {
