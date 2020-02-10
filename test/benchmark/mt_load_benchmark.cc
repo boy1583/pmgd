@@ -120,27 +120,18 @@ public:
      * test insert edges in multiple threads
      */
      void test1(int nthread) {
-
-         // insert node
-        try {
-            Transaction tx(_db, Transaction::ReadWrite);
-            for (auto &node : nodes) {
-                Node &n = _db.add_node(node._label.c_str());
-                n.set_property("_id", node._id);
-                for (auto &p : node.ps) {
-                    n.set_property(p.first.c_str(), p.second.c_str());
-                }
-                nodeRefs[node._id] = &n;
-            }
-            tx.commit();
-
-        } catch (Exception &e) {
-             print_exception(e);
-        }
-        LOG_DEBUG_WRITE("console", "add all node finished, count is {}", nodeRefs.size())
-
          // multiple thread
          vector<thread> threads;
+
+        for (int i = 0;i < nthread; i++) {
+            threads.push_back(thread(&MTLoadBenchmark::insertNodeThread, this, nthread, i));
+        }
+
+        for (auto &t : threads) {
+            t.join();
+        }
+
+        threads.clear();
 
         index = 0;
 
@@ -166,6 +157,8 @@ public:
 
 private:
     void insertEdgeThread(int nthread, int tindex);
+
+     void insertNodeThread(int nthread, int tindex);
 
     Graph::Config& init_config(Graph::Config &config) {
         config.allocator_region_size = 104857600;  // 100MB
@@ -399,6 +392,32 @@ void MTLoadBenchmark::insertEdgeThread(int nthread, int tindex) {
     long long part = total / nthread;
 
     LOG_DEBUG_WRITE("console", "thread_{} finish handled {} records ≈ {}%", tindex, count, (100.0 * count / part))
+}
+
+void MTLoadBenchmark::insertNodeThread(int nthread, int tindex) {
+    // insert node
+    long long total = nodes.size();
+    long long part = (total + nthread - 1) / nthread;
+    long long begin = tindex * part;
+    long long end = begin + part;
+    if (end > total) end = total;
+    try {
+        Transaction tx(_db, Transaction::ReadWrite);
+        for (long long i = begin; i < end; i++) {
+            auto &node = nodes[i];
+            Node &n = _db.add_node(node._label.c_str());
+            n.set_property("_id", node._id);
+            for (auto &p : node.ps) {
+                n.set_property(p.first.c_str(), p.second.c_str());
+            }
+            nodeRefs[node._id] = &n;
+        }
+        tx.commit();
+
+    } catch (Exception &e) {
+        print_exception(e);
+    }
+    LOG_DEBUG_WRITE("console", "add all node finished, count is {}", nodeRefs.size())
 }
 
 
