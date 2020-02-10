@@ -46,7 +46,7 @@ static const size_t DEFAULT_EDGE_SIZE = 32;
 
 // each transaction is 64Byte，
 static const size_t DEFAULT_TRANSACTION_TABLE_SIZE = (SIZE_4KB); // max transaction 64
-static const size_t DEFAULT_JOURNAL_SIZE = SIZE_1GB * 16 * 64; // 16GB each transaction
+static const size_t DEFAULT_JOURNAL_SIZE = SIZE_1GB * 4 * 64; // 16GB each transaction
 
 static const size_t INDEX_MANAGER_SIZE = SIZE_4KB;
 
