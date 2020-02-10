@@ -404,8 +404,8 @@ void MTLoadBenchmark::insertNodeThread(int nthread, int tindex) {
     long long end = begin + part;
     if (end > total) end = total;
     try {
-        Transaction tx(_db, Transaction::ReadWrite);
         for (long long i = begin; i < end; i++) {
+            Transaction tx(_db, Transaction::ReadWrite);
             auto &node = nodes[i];
             Node &n = _db.add_node(node._label.c_str());
             n.set_property("_id", node._id);
@@ -413,9 +413,8 @@ void MTLoadBenchmark::insertNodeThread(int nthread, int tindex) {
                 n.set_property(p.first.c_str(), p.second.c_str());
             }
             nodeRefs[node._id] = &n;
+            tx.commit();
         }
-        tx.commit();
-
     } catch (Exception &e) {
         print_exception(e);
     }
