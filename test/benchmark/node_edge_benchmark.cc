@@ -191,9 +191,8 @@ void updateNodeBenchmark(Graph &db) {
 void deleteNodeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
     Transaction tx(db, Transaction::ReadWrite);
-    for (auto &n : nodes) {
-        Node &node = get_node(db, n._id, nullptr);
-        db.remove(node);
+    for (NodeIterator ni = db.get_nodes(); ni; ni.next()) {
+        db.remove(*ni);
     }
     tx.commit();
     auto end_t = system_clock::now();
@@ -272,9 +271,8 @@ void updateEdgeBenchmark(Graph &db) {
 void deleteEdgeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
     Transaction tx(db, Transaction::ReadWrite);
-    for (auto &e : edges) {
-        Edge &edge = get_edge(db, e._id, nullptr);
-        db.remove(edge);
+    for (EdgeIterator ei = db.get_edges(); ei; ei.next()) {
+        db.remove(*ei);
     }
     tx.commit();
     auto end_t = system_clock::now();
@@ -440,8 +438,10 @@ void doWork(int index, int argc, char* argv[], Graph &db) {
             updateEdgeBenchmark(db);
         } else if (!strcmp(argv[i], "deleteedge")) {
             deleteEdgeBenchmark(db);
+            count(db);
         } else if (!strcmp(argv[i], "deletenode")) {
             deleteNodeBenchmark(db);
+            count(db);
         } else {
             usage();
         }
