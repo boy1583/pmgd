@@ -54,7 +54,8 @@ static const int DEFAULT_MAX_STRINGID_LENGTH = 16;
 static const int DEFAULT_MAX_STRINGIDS = 4096;
 static const size_t DEFAULT_STRING_TABLE_SIZE = DEFAULT_MAX_STRINGIDS * DEFAULT_MAX_STRINGID_LENGTH;
 
-static const unsigned DEFAULT_NUM_ALLOCATORS = 1;
+
+static const unsigned DEFAULT_NUM_ALLOCATORS = 64; // origin value:1
 
 static const size_t DEFAULT_STRIPED_LOCK_SIZE = SIZE_2MB;
 static const unsigned DEFAULT_STRIPE_WIDTH = 64;  // bytes
