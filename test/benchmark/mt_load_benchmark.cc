@@ -178,18 +178,17 @@ int main(int argc, char* argv[]) {
     initLog();
 
     if (argc < 5) {
-        printf("Usage: program [dev_path] [data_type:ldbc/freebase/twitter] [dataset_path] [min_thread_num] [max_thread_num]\n");
+        printf("Usage: program [data_type:ldbc/freebase/twitter] [dataset_path] [min_thread_num] [max_thread_num]\n");
         return 0;
     }
 
-    const char* devPath = argv[1];
-    const char* dataType = argv[2];
-    const char* dataPath = argv[3];
-    int min_thread = atoi(argv[4]);
-    int max_thread = atoi(argv[5]);
+    const char* dataType = argv[1];
+    const char* dataPath = argv[2];
+    int min_thread = atoi(argv[3]);
+    int max_thread = atoi(argv[4]);
 
-    LOG_DEBUG_WRITE("console", "dev path:{}, dataset path: {}, min number of thread: {}, max number of thread: {}",
-                    devPath, dataPath, min_thread, max_thread);
+    LOG_DEBUG_WRITE("console", "dataset path: {}, min number of thread: {}, max number of thread: {}",
+            dataPath, min_thread, max_thread);
 
     vector<int> as = {1, 8, 16, 24, 32, 40};
 
