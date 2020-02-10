@@ -34,7 +34,7 @@ class LNode {
 public:
     long long        _id;
     string          _label;
-    std::vector<std::pair<std::string, std::string>>    ps;
+    std::vector<std::pair<std::string, std::string>> ps;
 };
 
 class LEdge {
@@ -64,6 +64,10 @@ private:
     map<long long, Node*> nodeRefs;
 
     vector<LEdge> edges;
+
+    // mutex
+    std::mutex mtx;
+    volatile long long index;
 
     /**
      * db
@@ -160,11 +164,9 @@ private:
 
     Graph::Config *init_config(Graph::Config *config) {
         config->allocator_region_size = 104857600;  // 100MB
-        config->num_allocators = 4;
+        config->num_allocators = std::thread::hardware_concurrency();
         return config;
     }
-
-
 };
 
 int main(int argc, char* argv[]) {
@@ -185,7 +187,8 @@ int main(int argc, char* argv[]) {
 
     try {
         MTLoadBenchmark mt;
-        mt.loadLDBCDataset(path);
+//        mt.loadLDBCDataset(path);
+        mt.loadFreebaseDataset(path);
         mt.test1(nthread);
         // 2 => 86s
     } catch (Exception &e) {
@@ -240,27 +243,82 @@ void MTLoadBenchmark::loadLDBCDataset(const char *json2_path) {
     fclose(fp);
 }
 
-void MTLoadBenchmark::insertEdgeThread(int nthread, int tindex) {
-    // insert part edges into db
-    const long long partNum = this->edges.size() / nthread;
-    const long long begin = partNum * tindex;
-    long long end = begin + partNum;
-    if (end > edges.size())
-        end = edges.size();
-    try {
-        Transaction tx(_db, Transaction::ReadWrite);
-        for (long long i = begin; i < end; i++) {
-            // insert edge
-            auto &e = edges[i];
-            Edge &edge = _db.add_edge(*nodeRefs[e._outV], *nodeRefs[e._inV], e._label.c_str());
-            edge.set_property("_id", e._id);
-            for (auto &p : e._ps) {
-                edge.set_property(p.first.c_str(), p.second.c_str());
-            }
-        }
-        tx.commit();
-    } catch (Exception &e) {
-        print_exception(e);
+void MTLoadBenchmark::loadFreebaseDataset(const char *json2_path) {
+    FILE* fp = fopen(json2_path, "r");
+
+    char readBuffer[65536];
+    FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+
+    Document d;
+    d.ParseStream<0, UTF8<>, FileReadStream>(is);
+
+    std::string mode = d["mode"].GetString();
+    if (mode != "EXTENDED") {
+        std::cerr << "ldbc dataset file must be EXTENDED format!";
+        exit(0);
     }
+
+    // 点 freebaseid _type mid _id
+    for (auto& v : d["vertices"].GetArray()) {
+        LNode node;
+        node._id = v["_id"].GetUint64();
+        node._label = v["_type"].GetString();
+        node.ps.emplace_back(make_pair("freebaseid", std::to_string(v["freebaseid"]["value"].GetUint64())));
+        node.ps.emplace_back(make_pair("mid", v["mid"]["value"].GetString()));
+        // if (vn > 1000) break;
+        nodes.emplace_back(node);
+    }
+    LOG_INFO_WRITE("console", "Load {} nodes.", nodes.size())
+
+    // 边 _type _outV _id _inV _label
+    for (auto& n : d["edges"].GetArray()) {
+        LEdge edge;
+        edge._id = n["_id"].GetUint64();
+        edge._outV = n["_outV"].GetUint64();
+        edge._inV = n["_inV"].GetUint64();
+        edge._label = n["_label"].GetString();
+        // if (nn > 1000) break;
+        edges.emplace_back(edge);
+    }
+    LOG_INFO_WRITE("console", "Load {} edges.", edges.size())
+    fclose(fp);
 }
+
+void MTLoadBenchmark::insertEdgeThread(int nthread, int tindex) {
+    long long count = 0;
+    const long long total = edges.size();
+    long long begin, end;
+    Transaction tx(_db, Transaction::ReadWrite);
+    while(true) {
+        mtx.lock();
+        begin = index;
+        index += 10000;
+        end = index;
+        mtx.unlock();
+        if (begin >= total)
+            break;
+        if (end > total)
+            end = total;
+        count += (end - begin);
+        try {
+
+            for (long long i = begin; i < end; i++) {
+                // insert edge
+                auto &e = edges[i];
+                Edge &edge = _db.add_edge(*nodeRefs[e._outV], *nodeRefs[e._inV], e._label.c_str());
+                edge.set_property("_id", e._id);
+                for (auto &p : e._ps) {
+                    edge.set_property(p.first.c_str(), p.second.c_str());
+                }
+            }
+        } catch (Exception &e) {
+            print_exception(e);
+        }
+    }
+    tx.commit();
+    long long part = total / nthread;
+
+    LOG_DEBUG_WRITE("console", "thread_{} finish handled {} records ≈ {}%", tindex, count, (100.0 * count / part))
+}
+
 
