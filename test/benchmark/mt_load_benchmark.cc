@@ -123,13 +123,15 @@ public:
          // multiple thread
          vector<thread> threads;
 
-        for (int i = 0;i < nthread; i++) {
+        for (int i = 0;i < 16; i++) {
             threads.push_back(thread(&MTLoadBenchmark::insertNodeThread, this, nthread, i));
         }
 
         for (auto &t : threads) {
             t.join();
         }
+
+        LOG_DEBUG_WRITE("console", "add all node finished, count is {}", nodeRefs.size())
 
         threads.clear();
 
@@ -417,7 +419,6 @@ void MTLoadBenchmark::insertNodeThread(int nthread, int tindex) {
     } catch (Exception &e) {
         print_exception(e);
     }
-    LOG_DEBUG_WRITE("console", "add all node finished, count is {}", nodeRefs.size())
 }
 
 
