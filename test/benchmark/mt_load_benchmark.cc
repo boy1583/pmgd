@@ -74,7 +74,7 @@ private:
 public:
     MTLoadBenchmark() :
     // init_config(&_config)
-        _db("graph_mt_load", Graph::Create) {
+        _db("graph_mt_load", Graph::Create, init_config(&_config)) {
     }
 
     /**

@@ -468,6 +468,9 @@ int main(int argc, char* argv[]) {
             // load data
             loadLdbcDataSet(argv[2]);
             // create new database
+            Graph::Config _config;
+            _config.allocator_region_size = 104857600;  // 100MB
+            _config.num_allocators = 8;
             Graph db(argv[3], Graph::Create);
             Transaction tx(db, Transaction::ReadWrite);
             ID = StringID(ID_STR);
