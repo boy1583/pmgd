@@ -75,7 +75,7 @@ template <typename T>
 void check_power_of_two(T val)
 {
     if ((val & (val - 1)) != 0) {
-        printf("%lld is not power of 2", val);
+        printf("%lld is not power of 2", (long long)val);
         throw PMGDException(InvalidConfig);
     }
 }
