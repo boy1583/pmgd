@@ -190,9 +190,12 @@ void updateNodeBenchmark(Graph &db) {
 // 删除点
 void deleteNodeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
+    long long count = 0;
     Transaction tx(db, Transaction::ReadWrite);
     for (NodeIterator ni = db.get_nodes(); ni; ni.next()) {
         db.remove(*ni);
+        count++;
+        if (count && count % 1000 == 0)LOG_DEBUG_WRITE("console", "delete {} finished", count)
     }
     tx.commit();
     auto end_t = system_clock::now();
