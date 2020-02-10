@@ -74,8 +74,10 @@ Graph::Config::Config()
 template <typename T>
 void check_power_of_two(T val)
 {
-    if ((val & (val - 1)) != 0)
+    if ((val & (val - 1)) != 0) {
+        printf("%d is not power of 2", val);
         throw PMGDException(InvalidConfig);
+    }
 }
 
 GraphConfig::GraphConfig(const Graph::Config *user_config)
