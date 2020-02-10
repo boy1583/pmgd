@@ -80,6 +80,9 @@ public:
         _db("graph_mt_load", Graph::Create) {
     }
 
+    ~MTLoadBenchmark() {
+    }
+
     /**
      * load ldbc dataset
      * @param path
@@ -172,31 +175,79 @@ private:
 };
 
 int main(int argc, char* argv[]) {
-    if (argc < 3) {
-        printf("Usage: program [dataset path] [thread num]\n");
+    initLog();
+
+    if (argc < 5) {
+        printf("Usage: program [dev_path] [data_type:ldbc/freebase/twitter] [dataset_path] [min_thread_num] [max_thread_num]\n");
         return 0;
     }
 
-    const char* path = argv[1];
-    int nthread = atoi(argv[2]);
+    const char* devPath = argv[1];
+    const char* dataType = argv[2];
+    const char* dataPath = argv[3];
+    int min_thread = atoi(argv[4]);
+    int max_thread = atoi(argv[5]);
 
-    initLog();
+    LOG_DEBUG_WRITE("console", "dev path:{}, dataset path: {}, min number of thread: {}, max number of thread: {}",
+                    devPath, dataPath, min_thread, max_thread);
 
-    if (system("rm -rf ./graph_mt_load") < 0)
-        exit(-1);
+    vector<int> as = {1, 8, 16, 24, 32, 40};
 
-    LOG_DEBUG_WRITE("console", "dataset path: {}, number of thread: {}", path, nthread)
-
-    try {
-        MTLoadBenchmark mt;
-//        mt.loadLDBCDataset(path);
-        mt.loadFreebaseDataset(path);
-        mt.test1(nthread);
-        // 2 => 86s
-    } catch (Exception &e) {
-        print_exception(e);
+    if (!strcmp(dataType, "ldbc")) {
+        /**
+     * ldbc
+     */
+        try {
+            for (auto n : as) {
+                if (system("rm -rf ./graph_mt_load") < 0)
+                    exit(-1);
+                MTLoadBenchmark mt;
+                mt.loadLDBCDataset(dataPath);
+                if (n <= max_thread && n >= min_thread) {
+                    mt.test1(n);
+                }
+            }
+        } catch (Exception &e) {
+            print_exception(e);
+        }
+    } else if (!strcmp(dataType, "freebase")) {
+        /**
+     * freebase
+     */
+        try {
+            for (auto n : as) {
+                if (system("rm -rf ./graph_mt_load") < 0)
+                    exit(-1);
+                MTLoadBenchmark mt;
+                mt.loadFreebaseDataset(dataPath);
+                if (n <= max_thread && n >= min_thread) {
+                    mt.test1(n);
+                }
+            }
+        } catch (Exception &e) {
+            print_exception(e);
+        }
+    } else if (!strcmp(dataType, "twitter")) {
+        /**
+     * twitter
+     */
+        try {
+            for (auto n : as) {
+                if (system("rm -rf ./graph_mt_load") < 0)
+                    exit(-1);
+                MTLoadBenchmark mt;
+                mt.loadTwitterDataset(dataPath);
+                if (n <= max_thread && n >= min_thread) {
+                    mt.test1(n);
+                }
+            }
+        } catch (Exception &e) {
+            print_exception(e);
+        }
+    } else {
+        LOG_ERROR_WRITE("console", "dataType mistake in [ldbc,freebase,twitter]")
+        return 0;
     }
-
 }
 
 void MTLoadBenchmark::loadLDBCDataset(const char *json2_path) {
@@ -284,6 +335,34 @@ void MTLoadBenchmark::loadFreebaseDataset(const char *json2_path) {
     }
     LOG_INFO_WRITE("console", "Load {} edges.", edges.size())
     fclose(fp);
+}
+
+void MTLoadBenchmark::loadTwitterDataset(const char *json2_path) {
+    std::ifstream ifile(json2_path);
+    uint64_t maxE = 11316811ULL;
+    nodes.resize(maxE);
+    for (uint64_t e = 1; e <= maxE; e++) {
+        nodes[e - 1]._id = e;
+        nodes[e - 1]._label = "labelV";
+    }
+    LOG_INFO_WRITE("console", "Load {} nodes.", nodes.size())
+
+    std::string buffer;
+    uint64_t from, to;
+    // std::set<uint64_t> es;
+    // uint64_t countE = 0, countV = 0;
+    uint64_t index = 1;
+    while(std::getline(ifile, buffer, (char)(0x0A))) {
+        std::istringstream sin(buffer);
+        sin >> from >> to;
+        LEdge edge;
+        edge._id = index++;
+        edge._outV = from;
+        edge._inV = to;
+        edge._label = "labelE";
+        edges.emplace_back(edge);
+    }
+    LOG_INFO_WRITE("console", "Load {} edges.", edges.size())
 }
 
 void MTLoadBenchmark::insertEdgeThread(int nthread, int tindex) {
