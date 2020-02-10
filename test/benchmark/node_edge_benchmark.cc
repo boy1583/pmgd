@@ -190,12 +190,12 @@ void updateNodeBenchmark(Graph &db) {
 // 删除点
 void deleteNodeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
+    Transaction tx(db, Transaction::ReadWrite);
     for (auto &n : nodes) {
-        Transaction tx(db, Transaction::ReadWrite);
         Node &node = get_node(db, n._id, nullptr);
         db.remove(node);
-        tx.commit();
     }
+    tx.commit();
     auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "node delete test => number of record: {}", nodes.size())
@@ -271,12 +271,12 @@ void updateEdgeBenchmark(Graph &db) {
 // 删除边
 void deleteEdgeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
+    Transaction tx(db, Transaction::ReadWrite);
     for (auto &e : edges) {
-        Transaction tx(db, Transaction::ReadWrite);
         Edge &edge = get_edge(db, e._id, nullptr);
         db.remove(edge);
-        tx.commit();
     }
+    tx.commit();
     auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "edge delete test (include property) => number of record: {}", edges.size())

@@ -169,7 +169,7 @@ private:
 
 int main(int argc, char* argv[]) {
     if (argc < 3) {
-        printf("Usage: program [dataset path] [thread num]");
+        printf("Usage: program [dataset path] [thread num]\n");
         return 0;
     }
 
