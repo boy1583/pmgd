@@ -74,11 +74,10 @@ private:
      */
     Graph _db;
     Graph::Config _config;
-
 public:
     MTLoadBenchmark() :
     // init_config(&_config)
-        _db("graph_mt_load", Graph::Create, init_config(&_config)) {
+        _db("graph_mt_load", Graph::Create, &init_config(_config)) {
     }
 
     /**
@@ -162,9 +161,10 @@ public:
 private:
     void insertEdgeThread(int nthread, int tindex);
 
-    Graph::Config *init_config(Graph::Config *config) {
-        config->allocator_region_size = 104857600;  // 100MB
-        config->num_allocators = std::thread::hardware_concurrency();
+    Graph::Config& init_config(Graph::Config &config) {
+        config.allocator_region_size = 104857600;  // 100MB
+        printf("hardware_concurrency is %u\n", std::thread::hardware_concurrency());
+        config.num_allocators = std::thread::hardware_concurrency();
         return config;
     }
 };
