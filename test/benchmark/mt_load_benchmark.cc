@@ -290,7 +290,6 @@ void MTLoadBenchmark::insertEdgeThread(int nthread, int tindex) {
     long long count = 0;
     const long long total = edges.size();
     long long begin, end;
-    Transaction tx(_db, Transaction::ReadWrite);
     while(true) {
         mtx.lock();
         begin = index;
@@ -303,7 +302,7 @@ void MTLoadBenchmark::insertEdgeThread(int nthread, int tindex) {
             end = total;
         count += (end - begin);
         try {
-
+            Transaction tx(_db, Transaction::ReadWrite);
             for (long long i = begin; i < end; i++) {
                 // insert edge
                 auto &e = edges[i];
@@ -313,11 +312,11 @@ void MTLoadBenchmark::insertEdgeThread(int nthread, int tindex) {
                     edge.set_property(p.first.c_str(), p.second.c_str());
                 }
             }
+            tx.commit();
         } catch (Exception &e) {
             print_exception(e);
         }
     }
-    tx.commit();
     long long part = total / nthread;
 
     LOG_DEBUG_WRITE("console", "thread_{} finish handled {} records ≈ {}%", tindex, count, (100.0 * count / part))
