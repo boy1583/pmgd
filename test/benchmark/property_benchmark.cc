@@ -34,7 +34,7 @@ static std::string gen_random(const int len) {
 // 100w random test each time
 // 10 times
 // int times = 1;
-const uint64_t dataSize = 20000;
+uint64_t dataSize = 20000;
 const uint64_t keySize = 10;
 const uint64_t valSize = 20;
 
@@ -62,8 +62,8 @@ void nodePropertyBenchmark(Graph &db) {
             Transaction tx(db, Transaction::ReadWrite);
             Node &node = db.add_node(0);
             n = &node;
-            LOG_DEBUG_WRITE("console", "insert new node...")
             tx.commit();
+            LOG_DEBUG_WRITE("console", "insert new node...")
         }
 
         auto start_t = system_clock::now();
@@ -263,13 +263,19 @@ void edgePropertyBenchmark(Graph &db) {
 
 
 int main(int argc, char* argv[]) {
-//    if (argc < 2) {
-//        printf("Usage: program [devdax path]\n");
-//        return -1;
-//    }
-    // char *PATH = argv[1];
+    if (argc < 2) {
+        printf("Usage: program [data num]\n");
+        return -1;
+    }
+
+    dataSize = atoll(argv[1]);
 
     initLog();
+
+    LOG_DEBUG_WRITE("console", "data size is {}", dataSize)
+
+    if (system("rm -rf ./property_db") < 0)
+        exit(-1);
 
     Graph db("property_db", Graph::Create);
 
