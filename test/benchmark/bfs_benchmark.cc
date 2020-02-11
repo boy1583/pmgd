@@ -37,6 +37,7 @@ void bfs(Graph &db, uint64_t tag, int maxDep) {
     visted.insert(tag);
     que.push(tag);
     int currentDep = 1;
+    long long count = 1;
     while(!que.empty() && currentDep < maxDep) {
         uint64_t id = que.front();
         que.pop();
@@ -53,6 +54,7 @@ void bfs(Graph &db, uint64_t tag, int maxDep) {
             if (!visted.count(next_id)) {
                 visted.insert(next_id);
                 que2.push(next_id);
+                count++;
             }
         }
         if (que.empty()) {
@@ -64,10 +66,10 @@ void bfs(Graph &db, uint64_t tag, int maxDep) {
                 que.push(que2.front());
                 que2.pop();
             }
-
             // std::cout << std::endl;
         }
     }
+    LOG_DEBUG_WRITE("console", "tag:{} maxDep:{} => {}", tag, maxDep, count)
 }
 
 int main(int argc, char* argv[]) {
