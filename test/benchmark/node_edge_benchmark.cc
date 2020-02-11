@@ -193,10 +193,11 @@ void updateNodeBenchmark(Graph &db) {
 void deleteNodeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
     long long count = 0;
+    Transaction tx(db, Transaction::ReadOnly);
     for (NodeIterator ni = db.get_nodes(); ni; ni.next()) {
-        Transaction tx(db, Transaction::ReadWrite);
+        Transaction tx2(db, Transaction::ReadWrite);
         db.remove(*ni);
-        tx.commit();
+        tx2.commit();
         count++;
         if (count && count % 1000 == 0)LOG_DEBUG_WRITE("console", "delete {} finished", count)
     }
@@ -277,10 +278,11 @@ void updateEdgeBenchmark(Graph &db) {
 // 删除边
 void deleteEdgeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
+    Transaction tx(db, Transaction::ReadOnly);
     for (EdgeIterator ei = db.get_edges(); ei; ei.next()) {
-        Transaction tx(db, Transaction::ReadWrite);
+        Transaction tx2(db, Transaction::ReadWrite);
         db.remove(*ei);
-        tx.commit();
+        tx2.commit();
     }
     auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
