@@ -148,7 +148,7 @@ void nodePropertyBenchmark(Graph &db) {
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t); // μs 微妙
         LOG_DEBUG_WRITE("console",
-                        "node property zone update test => key size: {} bytes, value size: {} bytes, number of record: {}",
+                        "node property zone delete test => key size: {} bytes, value size: {} bytes, number of record: {}",
                         keySize, valSize, dataSize)
         LOG_DEBUG_WRITE("console", "duration is {} microseconds ≈ {} s, {} microseconds each record",
                         double(duration.count()),

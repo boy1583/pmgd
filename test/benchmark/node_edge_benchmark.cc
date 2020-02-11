@@ -127,15 +127,17 @@ void loadLdbcDataSet(const char* ldbcPath) {
 }
 
 // 插入点
-void insertNodeBenchmark(Graph &db) {
+void insertNodeBenchmark(Graph &db, bool skipProperty = false) {
     auto start_t = system_clock::now();
     for (auto &n : nodes) {
         Transaction tx(db, Transaction::ReadWrite);
         Node &node = db.add_node(StringID(n.xlabel.c_str()));
         node.set_property(ID_STR, n._id);
         // 可以省略了插入属性
-        for (auto &p : n.ps) {
-            node.set_property(StringID(p.first.c_str()), p.second);
+        if (!skipProperty) {
+            for (auto &p : n.ps) {
+                node.set_property(StringID(p.first.c_str()), p.second);
+            }
         }
         tx.commit();
     }
@@ -191,13 +193,13 @@ void updateNodeBenchmark(Graph &db) {
 void deleteNodeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
     long long count = 0;
-    Transaction tx(db, Transaction::ReadWrite);
     for (NodeIterator ni = db.get_nodes(); ni; ni.next()) {
+        Transaction tx(db, Transaction::ReadWrite);
         db.remove(*ni);
+        tx.commit();
         count++;
         if (count && count % 1000 == 0)LOG_DEBUG_WRITE("console", "delete {} finished", count)
     }
-    tx.commit();
     auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "node delete test => number of record: {}", nodes.size())
@@ -210,7 +212,7 @@ void deleteNodeBenchmark(Graph &db) {
 // (再次插入点)
 
 // 插入边
-void insertEdgeBenchmark(Graph &db) {
+void insertEdgeBenchmark(Graph &db, bool skipProperty = false) {
     auto start_t = system_clock::now();
     for (auto &e : edges) {
         Transaction tx(db, Transaction::ReadWrite);
@@ -221,7 +223,9 @@ void insertEdgeBenchmark(Graph &db) {
 
         edge.set_property(ID_STR, e._id);
         // maybe not include property
-        edge.set_property(StringID("_label"), e._label);
+        if (!skipProperty) {
+            edge.set_property(StringID("_label"), e._label);
+        }
 
         tx.commit();
     }
@@ -273,11 +277,11 @@ void updateEdgeBenchmark(Graph &db) {
 // 删除边
 void deleteEdgeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
-    Transaction tx(db, Transaction::ReadWrite);
     for (EdgeIterator ei = db.get_edges(); ei; ei.next()) {
+        Transaction tx(db, Transaction::ReadWrite);
         db.remove(*ei);
+        tx.commit();
     }
-    tx.commit();
     auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
     LOG_DEBUG_WRITE("console", "edge delete test (include property) => number of record: {}", edges.size())
