@@ -58,18 +58,25 @@ void nodePropertyBenchmark(Graph &db) {
     Node *n = 0;
     // create a node
     {
-        Transaction tx(db, Transaction::ReadWrite);
-        Node &node = db.add_node(0);
-        n = &node;
-        LOG_DEBUG_WRITE("console", "insert new node...")
+        {
+            Transaction tx(db, Transaction::ReadWrite);
+            Node &node = db.add_node(0);
+            n = &node;
+            LOG_DEBUG_WRITE("console", "insert new node...")
+            tx.commit();
+        }
 
         auto start_t = system_clock::now();
-        // Transaction tx(db, Transaction::ReadWrite);
-        for (auto &kv : datas) {
-            node.set_property(kv.first.c_str(), kv.second.c_str());
-            // LOG_DEBUG_WRITE("console", "inserted {} -> {}", kv.first, kv.second)
+        {
+            // Transaction tx(db, Transaction::ReadWrite);
+            for (auto &kv : datas) {
+                Transaction tx(db, Transaction::ReadWrite);
+                n->set_property(kv.first.c_str(), kv.second.c_str());
+                // LOG_DEBUG_WRITE("console", "inserted {} -> {}", kv.first, kv.second)
+                tx.commit();
+            }
         }
-        tx.commit();
+
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t); // μs 微妙
         LOG_DEBUG_WRITE("console",
@@ -80,6 +87,7 @@ void nodePropertyBenchmark(Graph &db) {
                         double(duration.count()) * microseconds::period::num / microseconds::period::den,
                         double(duration.count()) / dataSize)
     }
+    return;
 
 
     // get
@@ -289,7 +297,7 @@ int main(int argc, char* argv[]) {
     // 2. get edge property
     // 3. update edge property
     // 4. delete edge property
-    edgePropertyBenchmark(db);
+    // edgePropertyBenchmark(db);
 
     LOG_DEBUG_WRITE("console", "close pool finished.")
 }
