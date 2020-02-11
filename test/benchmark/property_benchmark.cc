@@ -34,7 +34,7 @@ static std::string gen_random(const int len) {
 // 100w random test each time
 // 10 times
 // int times = 1;
-const uint64_t dataSize = 2000;
+const uint64_t dataSize = 20000;
 const uint64_t keySize = 10;
 const uint64_t valSize = 20;
 
@@ -87,17 +87,13 @@ void nodePropertyBenchmark(Graph &db) {
                         double(duration.count()) * microseconds::period::num / microseconds::period::den,
                         double(duration.count()) / dataSize)
     }
-    return;
-
 
     // get
     {
         auto start_t = system_clock::now();
         {
-            Transaction tx(db, Transaction::ReadOnly);
-            Node &node = db.add_node(0);
-            n = &node;
             for (auto &kv : datas) {
+                Transaction tx(db, Transaction::ReadOnly);
                 n->get_property(kv.first.c_str()).string_value();
             }
         }
@@ -122,11 +118,11 @@ void nodePropertyBenchmark(Graph &db) {
         LOG_DEBUG_WRITE("console", "modify finished...")
         auto start_t = system_clock::now();
         {
-            Transaction tx(db, Transaction::ReadWrite);
             for (auto &kv : datas) {
+                Transaction tx(db, Transaction::ReadWrite);
                 n->set_property(kv.first.c_str(), kv.second.c_str());
+                tx.commit();
             }
-            tx.commit();
         }
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t); // μs 微妙
@@ -143,11 +139,11 @@ void nodePropertyBenchmark(Graph &db) {
     {
         auto start_t = system_clock::now();
         {
-            Transaction tx(db, Transaction::ReadWrite);
             for (auto &kv : datas) {
+                Transaction tx(db, Transaction::ReadWrite);
                 n->remove_property(kv.first.c_str());
+                tx.commit();
             }
-            tx.commit();
         }
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t); // μs 微妙
@@ -177,11 +173,12 @@ void edgePropertyBenchmark(Graph &db) {
     // insert
     {
         auto start_t = system_clock::now();
-        Transaction tx(db, Transaction::ReadWrite);
         for (auto &kv : datas) {
+            Transaction tx(db, Transaction::ReadWrite);
             e->set_property(kv.first.c_str(), kv.second.c_str());
+            tx.commit();
         }
-        tx.commit();
+
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t); // μs 微妙
         LOG_DEBUG_WRITE("console",
@@ -198,8 +195,8 @@ void edgePropertyBenchmark(Graph &db) {
     {
         auto start_t = system_clock::now();
         {
-            Transaction tx(db, Transaction::ReadOnly);
             for (auto &kv : datas) {
+                Transaction tx(db, Transaction::ReadOnly);
                 e->get_property(kv.first.c_str()).string_value();
             }
         }
@@ -224,11 +221,11 @@ void edgePropertyBenchmark(Graph &db) {
         LOG_DEBUG_WRITE("console", "modify finished...")
         auto start_t = system_clock::now();
         {
-            Transaction tx(db, Transaction::ReadWrite);
             for (auto &kv : datas) {
+                Transaction tx(db, Transaction::ReadWrite);
                 e->set_property(kv.first.c_str(), kv.second.c_str());
+                tx.commit();
             }
-            tx.commit();
         }
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t); // μs 微妙
@@ -245,11 +242,11 @@ void edgePropertyBenchmark(Graph &db) {
     {
         auto start_t = system_clock::now();
         {
-            Transaction tx(db, Transaction::ReadWrite);
             for (auto &kv : datas) {
+                Transaction tx(db, Transaction::ReadWrite);
                 e->remove_property(kv.first.c_str());
+                tx.commit();
             }
-            tx.commit();
         }
         auto end_t = system_clock::now();
         auto duration = duration_cast<microseconds>(end_t - start_t); // μs 微妙
@@ -297,7 +294,7 @@ int main(int argc, char* argv[]) {
     // 2. get edge property
     // 3. update edge property
     // 4. delete edge property
-    // edgePropertyBenchmark(db);
+    edgePropertyBenchmark(db);
 
     LOG_DEBUG_WRITE("console", "close pool finished.")
 }
