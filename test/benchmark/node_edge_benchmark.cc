@@ -132,9 +132,9 @@ void insertNodeBenchmark(Graph &db, bool skipProperty = false) {
     for (auto &n : nodes) {
         Transaction tx(db, Transaction::ReadWrite);
         Node &node = db.add_node(StringID(n.xlabel.c_str()));
-        node.set_property(ID_STR, n._id);
         // 可以省略了插入属性
         if (!skipProperty) {
+            node.set_property(ID_STR, n._id);
             for (auto &p : n.ps) {
                 node.set_property(StringID(p.first.c_str()), p.second);
             }
@@ -221,9 +221,9 @@ void insertEdgeBenchmark(Graph &db, bool skipProperty = false) {
         Node &dst = get_node(db, e._inV, nullptr);
         Edge &edge = db.add_edge(src, dst, "labelE");
 
-        edge.set_property(ID_STR, e._id);
         // maybe not include property
         if (!skipProperty) {
+            edge.set_property(ID_STR, e._id);
             edge.set_property(StringID("_label"), e._label);
         }
 
@@ -482,9 +482,12 @@ int main(int argc, char* argv[]) {
             db.create_index(Graph::EdgeIndex, 0, ID_STR, PropertyType::Integer);
             tx.commit();
 
-            insertNodeBenchmark(db);
 
-            insertEdgeBenchmark(db);
+            // @todo remove skip property flag
+
+            insertNodeBenchmark(db, true);
+
+            insertEdgeBenchmark(db, true);
 
             doWork(4, argc, argv, db);
 
