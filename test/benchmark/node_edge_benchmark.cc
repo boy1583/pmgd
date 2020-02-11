@@ -133,8 +133,8 @@ void insertNodeBenchmark(Graph &db, bool skipProperty = false) {
         Transaction tx(db, Transaction::ReadWrite);
         Node &node = db.add_node(StringID(n.xlabel.c_str()));
         // 可以省略了插入属性
+        node.set_property(ID_STR, n._id);
         if (!skipProperty) {
-            node.set_property(ID_STR, n._id);
             for (auto &p : n.ps) {
                 node.set_property(StringID(p.first.c_str()), p.second);
             }
@@ -193,10 +193,10 @@ void updateNodeBenchmark(Graph &db) {
 void deleteNodeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
     long long count = 0;
-    Transaction tx(db, Transaction::ReadOnly);
-    for (NodeIterator ni = db.get_nodes(); ni; ni.next()) {
+    for (auto &node : nodes) {
         Transaction tx2(db, Transaction::ReadWrite);
-        db.remove(*ni);
+        Node &n = get_node(db, node._id, nullptr);
+        db.remove(n);
         tx2.commit();
         count++;
         if (count && count % 1000 == 0)LOG_DEBUG_WRITE("console", "delete {} finished", count)
@@ -221,10 +221,10 @@ void insertEdgeBenchmark(Graph &db, bool skipProperty = false) {
         Node &src = get_node(db, e._outV, nullptr);
         Node &dst = get_node(db, e._inV, nullptr);
         Edge &edge = db.add_edge(src, dst, "labelE");
-
+        edge.set_property(ID_STR, e._id);
         // maybe not include property
         if (!skipProperty) {
-            edge.set_property(ID_STR, e._id);
+
             edge.set_property(StringID("_label"), e._label);
         }
 
@@ -278,11 +278,11 @@ void updateEdgeBenchmark(Graph &db) {
 // 删除边
 void deleteEdgeBenchmark(Graph &db) {
     auto start_t = system_clock::now();
-    Transaction tx(db, Transaction::ReadOnly);
-    for (EdgeIterator ei = db.get_edges(); ei; ei.next()) {
-        Transaction tx2(db, Transaction::ReadWrite);
-        db.remove(*ei);
-        tx2.commit();
+    for (auto &e : edges) {
+        Transaction tx(db, Transaction::ReadWrite);
+        Edge &edge = get_edge(db, e._id, nullptr);
+        db.remove(edge);
+        tx.commit();
     }
     auto end_t = system_clock::now();
     auto duration = duration_cast<microseconds>(end_t - start_t);
